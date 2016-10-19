@@ -35,9 +35,9 @@ platform :ios do
     )
   end
   
-  desc "Upload a local IPA to Crashlytics with (group (car-net-ios-qa))."
+  desc "Upload a local IPA to Crashlytics with (group)."
   lane :uploadToCrashlytics do |options|
-    options[:group] ||= "car-net-ios-qa"
+    raise "uploadToCrashlytics: A Crashlytics group must be passed as an option." unless options[:group]
     
     crashlytics(
       crashlytics_path: './Pods/Crashlytics/',
@@ -46,12 +46,13 @@ platform :ios do
     )
   end
   
-  desc "Build and upload to Crashlytics with (configuration (Release)), (include_bitcode (false)), (export_method (enterprise)), and (group (eco-ios-internal))."
+  desc "Build and upload to Crashlytics with (configuration (Release)), (include_bitcode (false)), (export_method (enterprise)), and (group)."
   lane :beta do |options|
     options[:configuration] ||= "Release"
     options[:include_bitcode] ||= false
     options[:export_method] ||= "enterprise"
-    options[:group] ||= "car-net-ios-qa"
+    
+    raise "beta: A Crashlytics group must be passed as an option." unless options[:group]
     
     installProfiles
     
@@ -73,7 +74,10 @@ platform :ios do
   lane :betaQA do
     increment_build_number
     
-    beta
+    options[:group] ||= ENV["CRASHLYTICS_BETA_GROUP"]
+    raise "betaQA: A Crashlytics group must be passed as an option or provided through the CRASHLYTICS_BETA_GROUP environment variable." unless options[:group]
+    
+    beta(group: options[:group])
     
     commit_version_bump(message: "Automatically bumping build number to #{lane_context[SharedValues::BUILD_NUMBER]}.")
     push_to_git_remote
@@ -91,6 +95,8 @@ end
 
 desc "Installs any provisioning profiles in $PROFILE_DIRECTORY, relative to fastlane's execution path."
 lane :installProfiles do
+  raise "installProfiles: PROFILE_DIRECTORY environment variable required." unless ENV["PROFILE_DIRECTORY"]
+  
   Dir.glob("#{ENV["PROFILE_DIRECTORY"]}/*.mobileprovision") do |profile|
     FastlaneCore::ProvisioningProfile.install(profile)
   end
