@@ -74,9 +74,9 @@ platform :ios do
   lane :betaQA do
     increment_build_number
     
-    raise "betaQA: A Crashlytics group must be provided through the CRASHLYTICS_BETA_GROUP environment variable." unless ENV["CRASHLYTICS_BETA_GROUP"]
+    raise "betaQA: A Crashlytics group must be provided through the CRASHLYTICS_QA_GROUP environment variable." unless ENV["CRASHLYTICS_QA_GROUP"]
     
-    beta(group: ENV["CRASHLYTICS_BETA_GROUP"])
+    beta(group: ENV["CRASHLYTICS_QA_GROUP"])
     
     commit_version_bump(message: "Automatically bumping build number to #{lane_context[SharedValues::BUILD_NUMBER]}.")
     push_to_git_remote
