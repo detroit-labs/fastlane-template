@@ -74,10 +74,9 @@ platform :ios do
   lane :betaQA do
     increment_build_number
     
-    options[:group] ||= ENV["CRASHLYTICS_BETA_GROUP"]
-    raise "betaQA: A Crashlytics group must be passed as an option or provided through the CRASHLYTICS_BETA_GROUP environment variable." unless options[:group]
+    raise "betaQA: A Crashlytics group must be provided through the CRASHLYTICS_BETA_GROUP environment variable." unless ENV["CRASHLYTICS_BETA_GROUP"]
     
-    beta(group: options[:group])
+    beta(group: ENV["CRASHLYTICS_BETA_GROUP"])
     
     commit_version_bump(message: "Automatically bumping build number to #{lane_context[SharedValues::BUILD_NUMBER]}.")
     push_to_git_remote
