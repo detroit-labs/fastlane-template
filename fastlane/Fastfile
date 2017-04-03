@@ -6,9 +6,9 @@ platform :ios do
 
   before_all do
     xcversion(version: ENV["XCODE_VERSION"] || '~> 8.2.0')
-    if !(ENV["SKIP_COCOAPODS"] || false) {
+    if !(ENV["SKIP_COCOAPODS"] || false) 
       cocoapods(silent: true, repo_update: true)
-    }
+    end
   end
   
   after_all do
