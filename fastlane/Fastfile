@@ -21,6 +21,7 @@ platform :ios do
       configuration: "Debug",
       output_types: "junit",
       device: ENV["DEVICE"] || 'iPhone 7 (10.2)',
+      output_directory: ENV["TEST_OUTPUT_DIRECTORY"] || './fastlane/test_output'
     )
   end
 
