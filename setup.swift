@@ -37,7 +37,7 @@ let projectFileName = findProjectName()
 let projectName = projectFileName.components(separatedBy: ".")[0]
 
 func rubyVersionFile() -> File {
-    let rubyVersionContent = "2.4.0".data(using: .utf8)!
+    let rubyVersionContent = "2.4.1".data(using: .utf8)!
     let rubyVersionName = ".ruby-version"
     
     return File(name: rubyVersionName, contents: rubyVersionContent)
