@@ -65,7 +65,7 @@ platform :ios do
     options[:configuration] ||= "Release"
     options[:include_bitcode] ||= false
     options[:export_method] ||= "enterprise"
-    options[:notes] ||= changelog_from_git_commits
+    options[:notes] ||= ""
 
     raise "beta: A Crashlytics group must be passed as an option." unless options[:group]
 
