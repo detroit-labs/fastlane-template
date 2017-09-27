@@ -98,7 +98,7 @@ platform :ios do
     push_to_git_remote
   end
   
-  desc "Cleanup simulator"
+  desc "Cleanup simulator and build archives."
   lane :cleanup do
     # kill simulator
     sh "killall Simulator || :"
