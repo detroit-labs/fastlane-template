@@ -2,7 +2,16 @@
 
 import Foundation
 
-struct File {
+protocol FileProvider {
+    
+    var name: String { get }
+    
+    func writeToDisk()
+    
+}
+
+/// A file to be written to the current directory under `name` containing `contents`.
+struct File: FileProvider {
     
     let name: String
     let contents: Data
@@ -20,7 +29,24 @@ struct File {
     
 }
 
-func findProjectName() -> String {
+
+/// A file to be downloaded from `url` and saved to the current directory as `name`.
+struct RemoteFile: FileProvider {
+    
+    let url: URL
+    let name: String
+    
+    func writeToDisk() {
+        let process = Process.launchedProcess(launchPath: "/usr/bin/curl", arguments: ["-s", "--create-dirs", "-o", "\((FileManager.default.currentDirectoryPath as NSString).appendingPathComponent(name))", "\(url.absoluteString)"])
+        process.waitUntilExit()
+    }
+    
+}
+
+// When we get downloadable templates, put them here.
+// let prTemplate = RemoteFile(url: URL(string: "https://raw.githubusercontent.com/detroit-labs/fastlane-template/master/fastlane/Fastfile")!, name: "github/Fastfile")
+
+let projectFileName: String = {
     let currentPath = FileManager.default.currentDirectoryPath
     let contents = try! FileManager.default.contentsOfDirectory(atPath: currentPath)
     let projects = contents.filter { $0.contains("xcodeproj") }
@@ -29,45 +55,52 @@ func findProjectName() -> String {
         print("Either zero or too many xcodeprojs found, run this script on new projects only.")
         exit(0)
     }
-    
-    return project
-}
 
-let projectFileName = findProjectName()
+    return project
+}()
+
 let projectName = projectFileName.components(separatedBy: ".")[0]
 
-func rubyVersionFile() -> File {
-    let rubyVersionContent = "2.4.1".data(using: .utf8)!
-    let rubyVersionName = ".ruby-version"
-    
-    return File(name: rubyVersionName, contents: rubyVersionContent)
-}
+let rubyVersion: File = {
+    let rubyVersionContent = "2.4.2\n".data(using: .utf8)!
 
-func rubyGemsetFile() -> File {
-    let rubyGemsetContent = projectName.lowercased().data(using: .utf8)!
-    let rubyGemsetName = ".ruby-gemset"
-    
-    return File(name: rubyGemsetName, contents: rubyGemsetContent)
-}
+    return File(name: ".ruby-version", contents: rubyVersionContent)
+}()
 
-func gemfileFile() -> File {
-    let gemfileContent = "source \"https://rubygems.org\"\n\ngem \"cocoapods\"\ngem \"fastlane\"\ngem \"xcode-install\"\n".data(using: .utf8)!
-    let gemfileName = "Gemfile"
-    
-    return File(name: gemfileName, contents: gemfileContent)
-}
+let rubyGemset: File = {
+    let rubyGemsetContent = "\(projectName.lowercased())\n".data(using: .utf8)!
 
-func fastfileFile() -> File {
-    let fastfileContent = "default_platform :ios\n\nimport_from_git(url: 'https://github.com/detroit-labs/fastlane-template')\n".data(using: .utf8)!
-    let fastfileName = "fastlane/Fastfile"
-    
-    return File(name: fastfileName, contents: fastfileContent)
-}
+    return File(name: ".ruby-gemset", contents: rubyGemsetContent)
+}()
+
+let gemfile: File = {
+    let gemfileContent = """
+                        source \"https://rubygems.org\"
+
+                        gem \"cocoapods\"
+                        gem \"fastlane\"
+                        gem \"xcode-install\"
+
+                        """.data(using: .utf8)!
+
+    return File(name: "Gemfile", contents: gemfileContent)
+}()
+
+let fastfile: File = {
+    let fastfileContent = """
+                        default_platform :ios
+
+                        import_from_git(url: 'https://github.com/detroit-labs/fastlane-template')
+
+                        """.data(using: .utf8)!
+
+    return File(name: "fastlane/Fastfile", contents: fastfileContent)
+}()
 
 let probableWorkspaceName = projectFileName.replacingOccurrences(of: "xcodeproj", with: "xcworkspace")
 let probableSchemeName = projectName
 
-func envFile(withWorkspaceName workspaceName: String, schemeName: String) -> File {
+func env(withWorkspaceName workspaceName: String, schemeName: String) -> File {
     let simSetting = "FASTLANE_EXPLICIT_OPEN_SIMULATOR=1"
     let gymWorkspace = "GYM_WORKSPACE=\"\(workspaceName)\""
     let gymScheme = "GYM_SCHEME=\"\(schemeName)\""
@@ -76,15 +109,18 @@ func envFile(withWorkspaceName workspaceName: String, schemeName: String) -> Fil
     let scanScheme = "SCAN_SCHEME=\"\(schemeName)\""
     let scanClean = "SCAN_CLEAN=true"
     let profileDirectory = "PROFILE_DIRECTORY=\"../Profiles\""
-    let xcodeVersion = "XCODE_VERSION=\"~> 8.3.0\""
-    
+    let xcodeVersion = "XCODE_VERSION=\"~> 9.0\""
+
     let env = [simSetting, gymWorkspace, gymScheme, gymClean, scanWorkspace, scanScheme, scanClean, profileDirectory, xcodeVersion].joined(separator: "\n") + "\n"
     let envContent = env.data(using: .utf8)!
-    let envName = "fastlane/.env"
-    
-    return File(name: envName, contents: envContent)
+
+    return File(name: "fastlane/.env", contents: envContent)
 }
 
-let files = [rubyVersionFile(), rubyGemsetFile(), gemfileFile(), fastfileFile(), envFile(withWorkspaceName: probableWorkspaceName, schemeName: probableSchemeName)]
-files.forEach { $0.writeToDisk() }
+let files: [FileProvider] = [rubyVersion, rubyGemset, gemfile, fastfile, env(withWorkspaceName: probableWorkspaceName, schemeName: probableSchemeName)]
+files.forEach { file in
+    file.writeToDisk()
+    print("\(file.name) written to disk.")
+}
 print("Files written.")
+
