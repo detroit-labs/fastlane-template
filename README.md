@@ -1,5 +1,5 @@
 # Automatic iOS Project Setup
-Run `swift <(curl -sS https://raw.githubusercontent.com/detroit-labs/fastlane-template/setup.swift)` from your new project directory to have the following files automatically added:
+Run `swift <(curl -sS https://raw.githubusercontent.com/detroit-labs/fastlane-template/master/setup.swift)` from your new project directory to have the following files automatically added:
  
  - `.ruby-version` with version `2.4.2` set.
  - `.ruby-gemset` with a name matching your project name, lowercased.
