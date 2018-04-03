@@ -62,7 +62,7 @@ let projectFileName: String = {
 let projectName = projectFileName.components(separatedBy: ".")[0]
 
 let rubyVersion: File = {
-    let rubyVersionContent = "2.5.0\n".data(using: .utf8)!
+    let rubyVersionContent = "2.5.1\n".data(using: .utf8)!
 
     return File(name: ".ruby-version", contents: rubyVersionContent)
 }()
