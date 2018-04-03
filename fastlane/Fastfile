@@ -1,13 +1,13 @@
-fastlane_version "2.58.0"
+fastlane_version "2.89.0"
 
 default_platform :ios
 
 platform :ios do
 
   before_all do
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 9.0')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 9.3')
     if !ENV["SKIP_COCOAPODS"]
-      cocoapods(silent: true, repo_update: true)
+      cocoapods(silent: true, try_repo_update_on_error: true)
     end
   end
   
@@ -20,7 +20,7 @@ platform :ios do
     scan(
       configuration: "Debug",
       output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone 8 (11.0)',
+      device: ENV["DEVICE"] || 'iPhone X (11.3)',
     )
   end
 
