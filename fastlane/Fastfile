@@ -1,4 +1,4 @@
-fastlane_version "2.89.0"
+fastlane_version "2.95.0"
 
 default_platform :ios
 
@@ -17,10 +17,8 @@ platform :ios do
   
   desc "Runs all the tests."
   lane :runTests do
-    scan(
-      configuration: "Debug",
-      output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone X (11.3)',
+    scan(output_types: "junit",
+      device: ENV["DEVICE"] || 'iPhone X (11.3)'
     )
   end
 
