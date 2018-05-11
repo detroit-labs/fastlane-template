@@ -1,11 +1,11 @@
-fastlane_version "2.75.0"
+fastlane_version "2.95.0"
 
 default_platform :ios
 
 platform :ios do
 
   before_all do
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 9.2')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 9.3')
     if !ENV["SKIP_COCOAPODS"]
       cocoapods(silent: true, try_repo_update_on_error: true)
     end
@@ -17,10 +17,8 @@ platform :ios do
   
   desc "Runs all the tests."
   lane :runTests do
-    scan(
-      configuration: "Debug",
-      output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone X (11.2)',
+    scan(output_types: "junit",
+      device: ENV["DEVICE"] || 'iPhone X (11.3)'
     )
   end
 

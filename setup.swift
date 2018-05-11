@@ -62,7 +62,7 @@ let projectFileName: String = {
 let projectName = projectFileName.components(separatedBy: ".")[0]
 
 let rubyVersion: File = {
-    let rubyVersionContent = "2.5.0\n".data(using: .utf8)!
+    let rubyVersionContent = "2.5.1\n".data(using: .utf8)!
 
     return File(name: ".ruby-version", contents: rubyVersionContent)
 }()
@@ -109,7 +109,7 @@ func env(withWorkspaceName workspaceName: String, schemeName: String) -> File {
     let scanScheme = "SCAN_SCHEME=\"\(schemeName)\""
     let scanClean = "SCAN_CLEAN=true"
     let profileDirectory = "PROFILE_DIRECTORY=\"../Profiles\""
-    let xcodeVersion = "XCODE_VERSION=\"~> 9.2\""
+    let xcodeVersion = "XCODE_VERSION=\"~> 9.3\""
 
     let env = [simSetting, gymWorkspace, gymScheme, gymClean, scanWorkspace, scanScheme, scanClean, profileDirectory, xcodeVersion].joined(separator: "\n") + "\n"
     let envContent = env.data(using: .utf8)!
