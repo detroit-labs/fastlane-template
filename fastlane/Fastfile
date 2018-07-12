@@ -1,11 +1,11 @@
-fastlane_version "2.95.0"
+fastlane_version "2.99.1"
 
 default_platform :ios
 
 platform :ios do
 
   before_all do
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 9.3')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 9.4')
     if !ENV["SKIP_COCOAPODS"]
       cocoapods(silent: true, try_repo_update_on_error: true)
     end
@@ -18,7 +18,7 @@ platform :ios do
   desc "Runs all the tests."
   lane :runTests do
     scan(output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone X (11.3)'
+      device: ENV["DEVICE"] || 'iPhone X (11.4)'
     )
   end
 
@@ -55,7 +55,6 @@ platform :ios do
     end
     
     crashlytics(
-      crashlytics_path: './Pods/Crashlytics/',
       groups: options[:group],
       notifications: 'true'
     )

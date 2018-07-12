@@ -109,7 +109,7 @@ func env(withWorkspaceName workspaceName: String, schemeName: String) -> File {
     let scanScheme = "SCAN_SCHEME=\"\(schemeName)\""
     let scanClean = "SCAN_CLEAN=true"
     let profileDirectory = "PROFILE_DIRECTORY=\"../Profiles\""
-    let xcodeVersion = "XCODE_VERSION=\"~> 9.3\""
+    let xcodeVersion = "XCODE_VERSION=\"~> 9.4\""
 
     let env = [simSetting, gymWorkspace, gymScheme, gymClean, scanWorkspace, scanScheme, scanClean, profileDirectory, xcodeVersion].joined(separator: "\n") + "\n"
     let envContent = env.data(using: .utf8)!
