@@ -121,15 +121,15 @@ lane :installProfiles do
 end
 
 desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes"
-lane :update_dependencies do
+lane :updateDependencies do
     xcversion(version: ENV["XCODE_VERSION"] || '~> 9.4')
     bundle_update
     cocoapods_update
-    send_update_pull_request unless git_status(path: ["./Gemfile.lock", "./Podfile.lock"]).empty?
+    sendUpdatePullRequest unless git_status(path: ["./Gemfile.lock", "./Podfile.lock"]).empty?
 end
 
 desc "Sends a pull request with the current changes to dependencies"
-lane :send_update_pull_request do
+lane :sendUpdatePullRequest do
     branchname = ENV["UPDATE_DEPENDENCIES_BRANCH"]
 
     create_git_branch(
