@@ -24,7 +24,7 @@ Installs any provisioning profiles in $PROFILE_DIRECTORY, relative to Fastlane's
 ```
 fastlane updateDependencies
 ```
-Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes. Requires the fastlane-plugin-git_status gem in your Pluginfile.
+Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes
 ### sendUpdatePullRequest
 ```
 fastlane sendUpdatePullRequest
