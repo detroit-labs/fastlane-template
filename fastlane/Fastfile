@@ -119,3 +119,48 @@ lane :installProfiles do
     FastlaneCore::ProvisioningProfile.install(profile)
   end
 end
+
+desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes"
+lane :updateDependencies do
+    fastlane_require 'fastlane-plugin-git_status'
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 9.4')
+    bundle_update
+    cocoapods_update
+    sendUpdatePullRequest unless git_status(path: ["./Gemfile.lock", "./Podfile.lock"]).empty?
+end
+
+desc "Sends a pull request with the current changes to dependencies"
+lane :sendUpdatePullRequest do
+    fastlane_require 'fastlane-plugin-git_status'
+
+    branchname = ENV["UPDATE_DEPENDENCIES_BRANCH"]
+
+    create_git_branch(
+      branchname: branchname
+    )
+
+    checkout_git_branch(
+      branchname: branchname
+    )
+
+    git_commit(
+      path: ["./Gemfile.lock", "./Podfile.lock"],
+      message: "Update dependencies"
+    )
+
+    push_to_git_remote(
+      remote: "origin",
+      local_branch: branchname,
+      remote_branch: branchname,
+      force: true,
+      tags: false
+    )
+
+    create_pull_request(
+      api_token: ENV["GITHUB_TOKEN"],
+      repo: ENV["GITHUB_REPO"],
+      head: branchname,
+      base: "master",
+      title: "Update Dependencies"
+    )
+end
