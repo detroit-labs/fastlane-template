@@ -20,14 +20,14 @@ or alternatively using `brew cask install fastlane`
 fastlane installProfiles
 ```
 Installs any provisioning profiles in $PROFILE_DIRECTORY, relative to Fastlane's execution path.
-### update_dependencies
+### updateDependencies
 ```
-fastlane update_dependencies
+fastlane updateDependencies
 ```
-Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes
-### send_update_pull_request
+Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes. Requires the fastlane-plugin-git_status gem in your Pluginfile.
+### sendUpdatePullRequest
 ```
-fastlane send_update_pull_request
+fastlane sendUpdatePullRequest
 ```
 Sends a pull request with the current changes to dependencies
 

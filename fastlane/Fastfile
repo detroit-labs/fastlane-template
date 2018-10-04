@@ -120,7 +120,7 @@ lane :installProfiles do
   end
 end
 
-desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes"
+desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes. Requires the fastlane-plugin-git_status gem in your Pluginfile."
 lane :updateDependencies do
     xcversion(version: ENV["XCODE_VERSION"] || '~> 9.4')
     bundle_update
