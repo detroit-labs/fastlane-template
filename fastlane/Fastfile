@@ -5,6 +5,7 @@ default_platform :ios
 platform :ios do
 
   before_all do
+    installKeychainsIfPossible
     xcversion(version: ENV["XCODE_VERSION"] || '~> 10.0')
     if !ENV["SKIP_COCOAPODS"]
       cocoapods(silent: true, try_repo_update_on_error: true)
@@ -13,6 +14,7 @@ platform :ios do
   
   after_all do
     cleanup
+    removeKeychainsIfPossible
   end
   
   desc "Runs all the tests."
@@ -123,7 +125,7 @@ end
 desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes"
 lane :updateDependencies do
     fastlane_require 'fastlane-plugin-git_status'
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 9.4')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 10.0')
     bundle_update
     cocoapods_update
     sendUpdatePullRequest unless git_status(path: ["./Gemfile.lock", "./Podfile.lock"]).empty?
@@ -163,6 +165,32 @@ lane :sendUpdatePullRequest do
       base: "master",
       title: "Update Dependencies"
     )
+end
+
+desc "Installs the DL and project keychains if provided. This is a transitional API that should be removed once all projects move to keychain injections."
+lane :installKeychainsIfPossible
+  if ENV["DL_KEYCHAIN_PATH"]
+    UI.message("Installing DL keychain...")
+    installDLKeychain
+  end
+  
+  if ENV["PROJECT_KEYCHAIN_NAME"]
+    UI.message("Installing project keychain...")
+    installProjectKeychain
+  end
+end
+
+desc "Removes the DL and project keychains if provided. This is a transitional API that should be removed once all projects move to keychain injections."
+lane :removeKeychainsIfPossible
+  if ENV["DL_KEYCHAIN_PATH"]
+    UI.message("Removing DL keychain...")
+    removeDLKeychain
+  end
+  
+  if ENV["PROJECT_KEYCHAIN_NAME"]
+    UI.message("Removing project keychain...")
+    removeProjectKeychain
+  end
 end
 
 desc "Installs the DL keychain. Must provide path (or DL_KEYCHAIN_PATH) and password (or DL_KEYCHAIN_PASSWORD) parameters."
