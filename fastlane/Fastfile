@@ -168,7 +168,7 @@ lane :sendUpdatePullRequest do
 end
 
 desc "Installs the DL and project keychains if provided. This is a transitional API that should be removed once all projects move to keychain injections."
-lane :installKeychainsIfPossible
+lane :installKeychainsIfPossible do
   if ENV["DL_KEYCHAIN_PATH"]
     UI.message("Installing DL keychain...")
     installDLKeychain
@@ -181,7 +181,7 @@ lane :installKeychainsIfPossible
 end
 
 desc "Removes the DL and project keychains if provided. This is a transitional API that should be removed once all projects move to keychain injections."
-lane :removeKeychainsIfPossible
+lane :removeKeychainsIfPossible do
   if ENV["DL_KEYCHAIN_PATH"]
     UI.message("Removing DL keychain...")
     removeDLKeychain
