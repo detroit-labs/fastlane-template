@@ -30,6 +30,46 @@ Updates project dependencies in Bundler and CocoaPods, then sends a pull request
 fastlane sendUpdatePullRequest
 ```
 Sends a pull request with the current changes to dependencies
+### installKeychainsIfPossible
+```
+fastlane installKeychainsIfPossible
+```
+Installs the DL and project keychains if provided. This is a transitional API that should be removed once all projects move to keychain injections.
+### removeKeychainsIfPossible
+```
+fastlane removeKeychainsIfPossible
+```
+Removes the DL and project keychains if provided. This is a transitional API that should be removed once all projects move to keychain injections.
+### installDLKeychain
+```
+fastlane installDLKeychain
+```
+Installs the DL keychain. Must provide path (or DL_KEYCHAIN_PATH) and password (or DL_KEYCHAIN_PASSWORD) parameters.
+### installProjectKeychain
+```
+fastlane installProjectKeychain
+```
+Installs the project keychain from a path relative to the root of the project. Must provide path (or PROJECT_KEYCHAIN_PATH), and password (or PROJECT_KEYCHAIN_PASSWORD) parameters.
+### installKeychain
+```
+fastlane installKeychain
+```
+Installs a keychain by first copying it. Requires the keychain file path and password parameters.
+### removeDLKeychain
+```
+fastlane removeDLKeychain
+```
+Remove the Detroit Labs keychain. Requires the DL keychain path, or for DL_KEYCHAIN_PATH to be set.
+### removeProjectKeychain
+```
+fastlane removeProjectKeychain
+```
+Remove the project keychain. Requires the project keychain path, or for PROJECT_KEYCHAIN_PATH to be set.
+### removeKeychain
+```
+fastlane removeKeychain
+```
+Removes a keychain by name by removing {name}Copy.
 
 ----
 

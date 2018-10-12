@@ -174,7 +174,7 @@ lane :installKeychainsIfPossible do
     installDLKeychain
   end
   
-  if ENV["PROJECT_KEYCHAIN_NAME"]
+  if ENV["PROJECT_KEYCHAIN_PATH"]
     UI.message("Installing project keychain...")
     installProjectKeychain
   end
@@ -187,7 +187,7 @@ lane :removeKeychainsIfPossible do
     removeDLKeychain
   end
   
-  if ENV["PROJECT_KEYCHAIN_NAME"]
+  if ENV["PROJECT_KEYCHAIN_PATH"]
     UI.message("Removing project keychain...")
     removeProjectKeychain
   end
@@ -204,15 +204,14 @@ lane :installDLKeychain do |options|
   installKeychain(path: path, password: password)
 end
 
-desc "Installs the project keychain from the root of the project. Must provide name (or PROJECT_KEYCHAIN_NAME), no extension, and password (or PROJECT_KEYCHAIN_PASSWORD) parameters."
+desc "Installs the project keychain from a path relative to the root of the project. Must provide path (or PROJECT_KEYCHAIN_PATH), and password (or PROJECT_KEYCHAIN_PASSWORD) parameters."
 lane :installProjectKeychain do |options|
-  name = options[:name] ||= ENV["PROJECT_KEYCHAIN_NAME"]
+  path = options[:path] ||= ENV["PROJECT_KEYCHAIN_PATH"]
   password = options[:password] ||= ENV["PROJECT_KEYCHAIN_PASSWORD"]
   
-  raise "installProjectKeychain requires a name paramter or PROJECT_KEYCHAIN_NAME to be set." unless name
+  raise "installProjectKeychain requires a name paramter or PROJECT_KEYCHAIN_PATH to be set." unless path
   raise "installProjectKeychain requires a password paramter or PROJECT_KEYCHAIN_PASSWORD to be set." unless password
   
-  path = File.join(File.expand_path("..", Dir.pwd), "#{name}.keychain")
   installKeychain(path: path, password: password)
 end
 
@@ -245,16 +244,17 @@ lane :removeDLKeychain do |options|
   removeKeychain(name: name)
 end
 
-desc "Remove the project keychain. Requires the project keychain name, or for PROJECT_KEYCHAIN_NAME to be set."
+desc "Remove the project keychain. Requires the project keychain path, or for PROJECT_KEYCHAIN_PATH to be set."
 lane :removeProjectKeychain do |options|
-  name = options[:name] ||= ENV["PROJECT_KEYCHAIN_NAME"]
+  path = options[:path] ||= ENV["PROJECT_KEYCHAIN_PATH"]
   
-  raise "removeProjectKeychain requires name parameter or PROJECT_KEYCHAIN_NAME to be set." unless name
+  raise "removeProjectKeychain requires path parameter or PROJECT_KEYCHAIN_PATH to be set." unless path
   
+  name = File.basename(path, File.extname(path))
   removeKeychain(name: name)
 end
 
-desc "Removes a keychain by name by removing a keychain named {name}Copy."
+desc "Removes a keychain by name by removing {name}Copy."
 lane :removeKeychain do |options|
   name = options[:name]
   
