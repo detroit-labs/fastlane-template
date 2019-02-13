@@ -99,6 +99,8 @@ platform :ios do
   
   desc "Kills the simulator and background process."
   lane :cleanupSimulator do
+    # attempt to quit simulators nicely
+    sh "xcrun simctl shutdown booted"
     # kill simulator
     sh "killall Simulator || :"
     # kill SimulatorService
