@@ -130,7 +130,7 @@ lane :updateDependencies do
     xcversion(version: ENV["XCODE_VERSION"] || '~> 10.1')
     bundle_update
     cocoapods_update
-    sendUpdatePullRequest unless git_status(path: ["./Gemfile.lock", "./Podfile.lock"]).empty?
+    sendUpdatePullRequest unless git_status.empty?
 end
 
 desc "Sends a pull request with the current changes to dependencies"
@@ -147,8 +147,12 @@ lane :sendUpdatePullRequest do
       branchname: branchname
     )
 
+    git_add(
+      path: "."
+    )
+
     git_commit(
-      path: ["./Gemfile.lock", "./Podfile.lock"],
+      path: ".",
       message: "Update dependencies"
     )
 
