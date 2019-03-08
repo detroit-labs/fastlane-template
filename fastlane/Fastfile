@@ -128,8 +128,9 @@ desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull r
 lane :updateDependencies do
     fastlane_require 'fastlane-plugin-git_status'
     xcversion(version: ENV["XCODE_VERSION"] || '~> 10.1')
-    bundle_update
-    cocoapods_update
+    bundle_update if File.exist?("../Gemfile.lock")
+    cocoapods_update if File.exist?("../Podfile.lock")
+    carthage(command: "update", no_build: true) if File.exist?("../Cartfile.resolved")
     sendUpdatePullRequest unless git_status.empty?
 end
 
