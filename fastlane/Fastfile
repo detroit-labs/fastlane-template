@@ -33,6 +33,11 @@ platform :ios do
     end
   end
 
+  desc "Sets the build number to the current commit count."
+  lane :set_build_number_to_commit_count do
+    increment_build_number(build_number: number_of_commits)
+  end
+
   desc "Build the archive and ipa with options (configuration (Release), include_bitcode (false), export_method (enterprise))."
   lane :build do |options|
     options[:configuration] ||= "Release"
