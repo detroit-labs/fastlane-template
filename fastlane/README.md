@@ -84,9 +84,9 @@ Runs all the tests.
 fastlane ios incrementBuildNumber
 ```
 Sets the version number to the given version or, if none is given, increments it.
-### ios set_build_number_to_commit_count
+### ios setBuildNumberToCommitCount
 ```
-fastlane ios set_build_number_to_commit_count
+fastlane ios setBuildNumberToCommitCount
 ```
 Sets the build number to the current commit count.
 ### ios build
