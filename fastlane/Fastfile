@@ -34,7 +34,7 @@ platform :ios do
   end
 
   desc "Sets the build number to the current commit count."
-  lane :set_build_number_to_commit_count do
+  lane :setBuildNumberToCommitCount do
     increment_build_number(build_number: number_of_commits)
   end
 
