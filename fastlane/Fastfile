@@ -54,16 +54,31 @@ platform :ios do
   end
   
   desc "Upload a local IPA to Crashlytics with (group)."
+  desc "#### Options"
+  desc " * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (boolean – default: `false`)"
+  desc " * **`changelog_source`**: The source to use to generate the changelog (e.g. `\"git\"`, `\"jenkins\"` – default: `"git"`)"
+  desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog."
   lane :uploadToCrashlytics do |options|
+    options[:generate_changelog] ||= false
+    options[:changelog_source] ||= "git"
+
     raise "uploadToCrashlytics: A Crashlytics group must be passed as an option." unless options[:group]
-    
-    if options[:generate_changelog] == true 
-      changelog_from_git_commits
+
+    unless options.key?(:release_notes)
+      if options[:generate_changelog] == true
+        case options[:changelog_source]
+          when "jenkins"
+            make_changelog_from_jenkins
+          else 
+            changelog_from_git_commits
+        end
+      end
     end
     
     crashlytics(
       groups: options[:group],
-      notifications: 'true'
+      notes: options[:release_notes], # if release_notes is nil, this will be overriden by any generated changelog.
+      notifications: true
     )
   end
 
@@ -78,7 +93,12 @@ platform :ios do
 
     build(configuration: options[:configuration], include_bitcode: options[:include_bitcode], export_method: options[:export_method])
 
-    uploadToCrashlytics(group: options[:group], generate_changelog: options[:generate_changelog])
+    uploadToCrashlytics(
+      group: options[:group], 
+      generate_changelog: options[:generate_changelog], 
+      changelog_source: options[:changelog_source], 
+      release_notes: option[:release_notes]
+    )
   end
   
   # Custom actions

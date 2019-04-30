@@ -99,6 +99,14 @@ Build the archive and ipa with options (configuration (Release), include_bitcode
 fastlane ios uploadToCrashlytics
 ```
 Upload a local IPA to Crashlytics with (group).
+
+#### Options
+
+ * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (e.g. `true`, `false` – default: `false`)
+
+ * **`changelog_source`**: The source to use to generate the changelog (e.g. `"git"`, `"jenkins"` – default: `git`)
+
+ * **`release_notes`**: A string to set as the release notes; overrides any generated changelog.
 ### ios beta
 ```
 fastlane ios beta
