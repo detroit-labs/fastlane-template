@@ -56,17 +56,17 @@ platform :ios do
   desc "Upload a local IPA to Crashlytics with (group)."
   desc "#### Options"
   desc " * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (boolean – default: `false`)"
-  desc " * **`changelog_source`**: The source to use to generate the changelog (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"` – default: `\"git\"`)"
+  desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"` – default: `\"git\"`)"
   desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog."
   lane :uploadToCrashlytics do |options|
     options[:generate_changelog] ||= false
-    options[:changelog_source] ||= "git"
+    options[:changelog_type] ||= "git"
 
     raise "uploadToCrashlytics: A Crashlytics group must be passed as an option." unless options[:group]
 
     unless options.key?(:release_notes)
       if options[:generate_changelog] == true
-        case options[:changelog_source]
+        case options[:changelog_type]
           when "jenkins"
             make_changelog_from_jenkins
 
@@ -101,7 +101,7 @@ platform :ios do
     uploadToCrashlytics(
       group: options[:group], 
       generate_changelog: options[:generate_changelog], 
-      changelog_source: options[:changelog_source], 
+      changelog_type: options[:changelog_type], 
       release_notes: option[:release_notes]
     )
   end

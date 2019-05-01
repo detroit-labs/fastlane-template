@@ -104,7 +104,7 @@ Upload a local IPA to Crashlytics with (group).
 
  * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (boolean – default: `false`)
 
- * **`changelog_source`**: The source to use to generate the changelog (e.g. `"git"`, `"jenkins"`, `"pr"` – default: `"git"`)
+ * **`changelog_type`**: The type of changelog to generate (e.g. `"git"`, `"jenkins"`, `"pr"` – default: `"git"`)
 
  * **`release_notes`**: A string to set as the release notes; overrides any generated changelog.
 ### ios beta
