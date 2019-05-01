@@ -74,8 +74,11 @@ platform :ios do
             UI.error("uploadToCrashlytics: Environment variable for PR ID is not set (ghprbPullId).") unless ENV.key?("ghprbPullId")
             options[:release_notes] = "PR: ##{ENV["ghprbPullId"]} (#{ENV["GIT_BRANCH"]})"
 
-          else 
+          when "git"
             changelog_from_git_commits
+
+          else 
+            UI.error("Unrecognized changelog_type: #{options[:changelog_type]}")
         end
       end
     end
