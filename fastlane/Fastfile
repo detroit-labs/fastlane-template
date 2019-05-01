@@ -56,7 +56,7 @@ platform :ios do
   desc "Upload a local IPA to Crashlytics with (group)."
   desc "#### Options"
   desc " * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (boolean – default: `false`)"
-  desc " * **`changelog_source`**: The source to use to generate the changelog (e.g. `\"git\"`, `\"jenkins\"` – default: `"git"`)"
+  desc " * **`changelog_source`**: The source to use to generate the changelog (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"` – default: `\"git\"`)"
   desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog."
   lane :uploadToCrashlytics do |options|
     options[:generate_changelog] ||= false
@@ -69,6 +69,11 @@ platform :ios do
         case options[:changelog_source]
           when "jenkins"
             make_changelog_from_jenkins
+
+          when "pr"
+            UI.error("uploadToCrashlytics: Environment variable for PR ID is not set (ghprbPullId).") unless ENV.key?("ghprbPullId")
+            options[:release_notes] = "PR: ##{ENV["ghprbPullId"]} (#{ENV["GIT_BRANCH"]})"
+
           else 
             changelog_from_git_commits
         end
