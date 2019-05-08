@@ -54,16 +54,39 @@ platform :ios do
   end
   
   desc "Upload a local IPA to Crashlytics with (group)."
+  desc "#### Options"
+  desc " * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (boolean – default: `false`)"
+  desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"` – default: `\"git\"`)"
+  desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog."
   lane :uploadToCrashlytics do |options|
+    options[:generate_changelog] ||= false
+    options[:changelog_type] ||= "git"
+
     raise "uploadToCrashlytics: A Crashlytics group must be passed as an option." unless options[:group]
-    
-    if options[:generate_changelog] == true 
-      changelog_from_git_commits
+
+    unless options.key?(:release_notes)
+      if options[:generate_changelog] == true
+        case options[:changelog_type]
+          when "jenkins"
+            make_changelog_from_jenkins
+
+          when "pr"
+            UI.error("uploadToCrashlytics: Environment variable for PR ID is not set (ghprbPullId).") unless ENV.key?("ghprbPullId")
+            options[:release_notes] = "PR: ##{ENV["ghprbPullId"]} (#{ENV["GIT_BRANCH"]})"
+
+          when "git"
+            changelog_from_git_commits
+
+          else 
+            UI.error("Unrecognized changelog_type: #{options[:changelog_type]}")
+        end
+      end
     end
     
     crashlytics(
       groups: options[:group],
-      notifications: 'true'
+      notes: options[:release_notes], # if release_notes is nil, this will be overriden by any generated changelog.
+      notifications: true
     )
   end
 
@@ -78,7 +101,12 @@ platform :ios do
 
     build(configuration: options[:configuration], include_bitcode: options[:include_bitcode], export_method: options[:export_method])
 
-    uploadToCrashlytics(group: options[:group], generate_changelog: options[:generate_changelog])
+    uploadToCrashlytics(
+      group: options[:group], 
+      generate_changelog: options[:generate_changelog], 
+      changelog_type: options[:changelog_type], 
+      release_notes: option[:release_notes]
+    )
   end
   
   # Custom actions
