@@ -105,7 +105,7 @@ platform :ios do
       group: options[:group], 
       generate_changelog: options[:generate_changelog], 
       changelog_type: options[:changelog_type], 
-      release_notes: option[:release_notes]
+      release_notes: options[:release_notes]
     )
   end
   
