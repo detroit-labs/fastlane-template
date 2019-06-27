@@ -6,7 +6,7 @@ platform :ios do
 
   before_all do
     installKeychainsIfPossible
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 10.1')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 10.2')
     if !ENV["SKIP_COCOAPODS"]
       cocoapods(silent: true, try_repo_update_on_error: true)
     end
@@ -20,7 +20,7 @@ platform :ios do
   desc "Runs all the tests."
   lane :runTests do
     scan(output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone XS (12.1)'
+      device: ENV["DEVICE"] || 'iPhone XS (12.2)'
     )
   end
 
@@ -160,7 +160,7 @@ end
 desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes"
 lane :updateDependencies do
     fastlane_require 'fastlane-plugin-git_status'
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 10.1')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 10.2')
     bundle_update if File.exist?("../Gemfile.lock")
     cocoapods_update if File.exist?("../Podfile.lock")
     carthage(command: "update", no_build: true) if File.exist?("../Cartfile.resolved")
