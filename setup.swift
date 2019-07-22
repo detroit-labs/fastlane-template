@@ -2,28 +2,25 @@
 
 import Foundation
 
-let arguments = CommandLine.arguments
+let currentDirectoryPath = FileManager.default.currentDirectoryPath
 
-let targetRootPath = FileManager.default.currentDirectoryPath
-
-let sourceRootPath: String
-if arguments.contains("--local") {
-    sourceRootPath = ("file://\(targetRootPath)/\(arguments[0])" as NSString).deletingLastPathComponent
-} else {
-    // TODO: replace `extract-files` with `master`
-    sourceRootPath = "https://raw.githubusercontent.com/detroit-labs/fastlane-template/extract-files"
-}
+let sourceRootPath: String = {
+    let arguments = CommandLine.arguments
+    guard arguments.contains("--local") else {
+        // TODO: replace `extract-files` with `master`
+        return "https://raw.githubusercontent.com/detroit-labs/fastlane-template/extract-files"
+    }
+    return ("file://\(currentDirectoryPath)/\(arguments[0])" as NSString).deletingLastPathComponent
+}()
 
 let projectFileName: String = {
-    let currentPath = FileManager.default.currentDirectoryPath
-    let contents = try! FileManager.default.contentsOfDirectory(atPath: currentPath)
+    let contents = try! FileManager.default.contentsOfDirectory(atPath: currentDirectoryPath)
     let projects = contents.filter { $0.contains("xcodeproj") }
     guard projects.count == 1,
         let project = projects.first else {
             print("Either zero or too many xcodeprojs found, run this script on new projects only.")
             exit(0)
     }
-    
     return project
 }()
 
@@ -31,8 +28,10 @@ let projectName = (projectFileName as NSString).deletingPathExtension
 let workspaceName = (projectName as NSString).appendingPathExtension("xcworkspace")!
 
 let environment: [String: String] = [
+    "IOS_VERSION": "11.0",
     "RUBY_GEMSET": projectName.lowercased(),
     "RUBY_VERSION": "2.6.3",
+    "XCODE_PROJECT_NAME": projectName,
     "XCODE_SCHEME_NAME": projectName,
     "XCODE_WORKSPACE_NAME": workspaceName,
     "XCODE_VERSION": "10.2",
@@ -53,7 +52,7 @@ struct TemplateFile {
     
     func writeToDisk() {
         if target.contains("/") {
-            let directoryPath = ("\(targetRootPath)/\(target)" as NSString).deletingLastPathComponent
+            let directoryPath = (target as NSString).deletingLastPathComponent
             try! FileManager.default.createDirectory(atPath: directoryPath, withIntermediateDirectories: true)
         }
         
@@ -61,17 +60,21 @@ struct TemplateFile {
         
         let contents = try! String(contentsOf: sourceURL, encoding: .utf8)
         let data = expand(contents).data(using: .utf8)!
-        FileManager.default.createFile(atPath: "\(targetRootPath)/\(target)", contents: data)
+        FileManager.default.createFile(atPath: target, contents: data)
     }
     
 }
 
 let files = [
+    TemplateFile(source: "cocoapods/Podfile", target: "Podfile"),
     TemplateFile(source: "fastlane/env", target: "fastlane/.env"),
     TemplateFile(source: "fastlane/Fastfile", target: "fastlane/Fastfile"),
     TemplateFile(source: "gems/Gemfile", target: "Gemfile"),
+    TemplateFile(source: "git/gitignore", target: ".gitignore"),
+    TemplateFile(source: "readme/README.MD", target: "README.MD"),
     TemplateFile(source: "ruby/ruby-gemset", target: ".ruby-gemset"),
-    TemplateFile(source: "ruby/ruby-version", target: ".ruby-version")
+    TemplateFile(source: "ruby/ruby-version", target: ".ruby-version"),
+    TemplateFile(source: "swiftlint/swiftlint.yml", target: ".swiftlint.yml")
 ]
 
 files.forEach { file in
