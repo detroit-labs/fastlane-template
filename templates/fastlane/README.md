@@ -1,2 +1,2 @@
-**Fastlane**
+# Fastlane
 https://docs.fastlane.tools/

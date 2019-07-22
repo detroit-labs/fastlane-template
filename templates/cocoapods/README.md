@@ -1,27 +1,29 @@
-**CocoaPods Keys**
+# Pods
+
+## CocoaPods Keys
 https://github.com/orta/cocoapods-keys
 https://github.com/orta/cocoapods-keys#alternative-usage
 
-**Podfile**
+# Podfile
 https://guides.cocoapods.org/syntax/podfile.html#podfile
 
-***Source***
+## Source
 https://guides.cocoapods.org/syntax/podfile.html#source
 
-***Platform***
+## Platform
 https://guides.cocoapods.org/syntax/podfile.html#platform
 
-***Use Framework***
+## Use Framework
 https://guides.cocoapods.org/syntax/podfile.html#use_frameworks_bang
 
-***Plugin***
+## Plugin
 https://guides.cocoapods.org/syntax/podfile.html#plugin
 
-***Pod***
+## Pod
 https://guides.cocoapods.org/syntax/podfile.html#pod
 
-***Target***
+## Target
 https://guides.cocoapods.org/syntax/podfile.html#target
 
-***Post Install***
+## Post Install
 https://guides.cocoapods.org/syntax/podfile.html#post_install
