@@ -1,29 +1,31 @@
-source 'https://github.com/CocoaPods/Specs.git'
-
 platform :ios, '__IOS_VERSION__'
-use_frameworks!
+
+pod 'SwiftLint'
 
 plugin 'cocoapods-keys', {
   :project => '__XCODE_PROJECT_NAME__',
   :targets => ['__XCODE_PROJECT_NAME__'],
   :keys => [
-	'exampleKey',
-	'exampleSecret'
+    'exampleKey',
+    'exampleSecret'
   ]
 }
 
-pod 'Blackboard'
-pod 'SwiftLint'
-
 target '__XCODE_PROJECT_NAME__' do
+  use_frameworks!
+
   pod 'Alamofire'
-    target '__XCODE_PROJECT_NAME__Tests' do
-    end
+  pod 'Blackboard'
+
+  target '__XCODE_PROJECT_NAME__Tests' do
+    inherit! :search_paths
+  end
+
 end
 
 post_install do | installer |
   require 'fileutils'
   FileUtils.cp_r('Pods/Target Support Files/Pods-__XCODE_PROJECT_NAME__/Pods-__XCODE_PROJECT_NAME__-acknowledgements.plist',
-  '__XCODE_PROJECT_NAME__/Settings.bundle/Acknowledgements.plist',
-  :remove_destination => true)
+    '__XCODE_PROJECT_NAME__/Resources/Settings.bundle/Acknowledgements.plist',
+    :remove_destination => true)
 end

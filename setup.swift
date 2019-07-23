@@ -68,6 +68,7 @@ let environment: [String: String] = [
 
 let files = [
     TemplateFile(source: "cocoapods/Podfile", target: "Podfile"),
+    TemplateFile(source: "cocoapods/Settings.bundle/Root.plist", target: "\(projectName)/Resources/Settings.bundle/Root.plist"),
     TemplateFile(source: "fastlane/env", target: "fastlane/.env"),
     TemplateFile(source: "fastlane/Fastfile", target: "fastlane/Fastfile"),
     TemplateFile(source: "gems/Gemfile", target: "Gemfile"),
