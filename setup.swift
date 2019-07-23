@@ -2,16 +2,45 @@
 
 import Foundation
 
+let branch = "extract-files" // TODO: "master"
+
 let currentDirectoryPath = FileManager.default.currentDirectoryPath
 
 let sourceRootPath: String = {
     let arguments = CommandLine.arguments
     guard arguments.contains("--local") else {
-        // TODO: replace `extract-files` with `master`
-        return "https://raw.githubusercontent.com/detroit-labs/fastlane-template/extract-files"
+        return "https://raw.githubusercontent.com/detroit-labs/fastlane-template/\(branch)"
     }
-    return ("file://\(currentDirectoryPath)/\(arguments[0])" as NSString).deletingLastPathComponent
+    let commandPath = (arguments[0] as NSString).deletingLastPathComponent
+    if commandPath.starts(with: "/") {
+        return "file://\(commandPath)"
+    }
+    return "file://\(currentDirectoryPath)/\(commandPath)"
 }()
+
+struct TemplateFile {
+    
+    let source: String
+    let target: String
+    
+    func writeToDisk(environment: [String: String]) {
+        if target.contains("/") {
+            let directoryPath = (target as NSString).deletingLastPathComponent
+            try! FileManager.default.createDirectory(atPath: directoryPath, withIntermediateDirectories: true)
+        }
+        
+        let sourceURL = URL(string: "\(sourceRootPath)/templates/\(source)")!
+        
+        var contents = try! String(contentsOf: sourceURL, encoding: .utf8)
+        environment.keys.forEach { key in
+            contents = contents.replacingOccurrences(of: "__\(key)__", with: environment[key]!)
+        }
+
+        let data = contents.data(using: .utf8)!
+        FileManager.default.createFile(atPath: target, contents: data)
+    }
+    
+}
 
 let projectFileName: String = {
     let contents = try! FileManager.default.contentsOfDirectory(atPath: currentDirectoryPath)
@@ -37,34 +66,6 @@ let environment: [String: String] = [
     "XCODE_VERSION": "10.2",
 ]
 
-func expand(_ contents: String) -> String {
-    var contents = contents
-    environment.keys.forEach { key in
-        contents = contents.replacingOccurrences(of: "__\(key)__", with: environment[key]!)
-    }
-    return contents
-}
-
-struct TemplateFile {
-    
-    let source: String
-    let target: String
-    
-    func writeToDisk() {
-        if target.contains("/") {
-            let directoryPath = (target as NSString).deletingLastPathComponent
-            try! FileManager.default.createDirectory(atPath: directoryPath, withIntermediateDirectories: true)
-        }
-        
-        let sourceURL = URL(string: "\(sourceRootPath)/templates/\(source)")!
-        
-        let contents = try! String(contentsOf: sourceURL, encoding: .utf8)
-        let data = expand(contents).data(using: .utf8)!
-        FileManager.default.createFile(atPath: target, contents: data)
-    }
-    
-}
-
 let files = [
     TemplateFile(source: "cocoapods/Podfile", target: "Podfile"),
     TemplateFile(source: "fastlane/env", target: "fastlane/.env"),
@@ -78,7 +79,7 @@ let files = [
 ]
 
 files.forEach { file in
-    file.writeToDisk()
+    file.writeToDisk(environment: environment)
     print("\(file.target) written to disk.")
 }
 print("Files written.")
