@@ -35,4 +35,3 @@ Include if relevant!
 - [ ] Added or updated code follows the code style of this project.
 - [ ] Relevant unit tests have been added or updated.
 - [ ] Relevant documentation has been added or updated.
-- [ ] Added or updated CocoaPods-keys and made the necessary changes to the Jenkins configurations.

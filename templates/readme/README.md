@@ -1,4 +1,4 @@
-# __PROJECT_NAME__
+# __XCODE_PROJECT_NAME__
 Describe project here.
 
 ## Requirements
@@ -7,8 +7,6 @@ Describe project here.
 
 ## Installation
 1. Clone the repo.
-
-1. Locate the keys the app needs. These will be collected in a future step, when installing pods, and will use [CocoaPods Keys](https://github.com/orta/cocoapods-keys).
 
 1. In the repo directory, run `gem install bundler && bundle install && (bundle exec pod install || bundle exec pod install --repo-update)` to install the necessary gems and pods.
 

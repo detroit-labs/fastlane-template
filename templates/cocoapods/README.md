@@ -6,12 +6,6 @@ CocoaPods plugin that generates a plist which includes the installation metadata
 https://github.com/CocoaPods/cocoapods-acknowledgements
 https://github.com/CocoaPods/CocoaPods/wiki/Acknowledgements
 
-## Keys
-A key value store for storing per-developer environment and application keys.
-
-https://github.com/orta/cocoapods-keys
-https://github.com/orta/cocoapods-keys#alternative-usage
-
 
 # Pods
 
@@ -24,6 +18,11 @@ https://github.com/Alamofire/Alamofire
 An iOS Storyboard and Asset Manager.
 
 https://github.com/NathanE73/Blackboard
+
+## SwiftFormat
+A code library and command-line formatting tool for reformatting Swift code.
+
+https://github.com/nicklockwood/SwiftFormat
 
 ## SwiftLint
 A tool to enforce Swift style and conventions.

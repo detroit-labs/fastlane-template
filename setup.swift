@@ -33,7 +33,7 @@ struct TemplateFile {
         
         var contents = try! String(contentsOf: sourceURL, encoding: .utf8)
         environment.keys.forEach { key in
-            contents = contents.replacingOccurrences(of: "__\(key)__", with: environment[key]!)
+            contents = contents.replacingOccurrences(of: key, with: environment[key]!)
         }
 
         let data = contents.data(using: .utf8)!
@@ -57,13 +57,15 @@ let projectName = (projectFileName as NSString).deletingPathExtension
 let workspaceName = (projectName as NSString).appendingPathExtension("xcworkspace")!
 
 let environment: [String: String] = [
-    "IOS_VERSION": "11.0",
-    "RUBY_GEMSET": projectName.lowercased(),
-    "RUBY_VERSION": "2.6.3",
-    "XCODE_PROJECT_NAME": projectName,
-    "XCODE_SCHEME_NAME": projectName,
-    "XCODE_WORKSPACE_NAME": workspaceName,
-    "XCODE_VERSION": "10.2",
+    "__IOS_VERSION__": "12.0",
+    "__IOS_DEVICE__": "iPhone X (12.4)",
+    "__RUBY_GEMSET__": projectName.lowercased(),
+    "__RUBY_VERSION__": "2.6.3",
+    "__SWIFT_VERSION__": "5.0",
+    "__XCODE_PROJECT_NAME__": projectName,
+    "__XCODE_SCHEME_NAME__": projectName,
+    "__XCODE_WORKSPACE_NAME__": workspaceName,
+    "__XCODE_VERSION__": "10.3"
 ]
 
 let files = [
@@ -77,9 +79,11 @@ let files = [
     TemplateFile(source: "github/ISSUE_TEMPLATE/bug_report.md", target: ".github/ISSUE_TEMPLATE/bug_report.md"),
     TemplateFile(source: "github/ISSUE_TEMPLATE/feature_request.md", target: ".github/ISSUE_TEMPLATE/feature_request.md"),
     TemplateFile(source: "github/pull_request_template.md", target: ".github/pull_request_template.md"),
-    TemplateFile(source: "readme/README.MD", target: "README.MD"),
+    TemplateFile(source: "readme/README.md", target: "README.md"),
     TemplateFile(source: "ruby/ruby-gemset", target: ".ruby-gemset"),
     TemplateFile(source: "ruby/ruby-version", target: ".ruby-version"),
+    TemplateFile(source: "swiftformat/swiftformat", target: ".swiftformat"),
+    TemplateFile(source: "swiftformat/swift-version", target: ".swift-version"),
     TemplateFile(source: "swiftlint/swiftlint.yml", target: ".swiftlint.yml")
 ]
 

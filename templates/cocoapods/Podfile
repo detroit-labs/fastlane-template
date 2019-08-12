@@ -1,21 +1,14 @@
 platform :ios, '__IOS_VERSION__'
 
+pod 'Blackboard'
+pod 'SwiftFormat/CLI'
 pod 'SwiftLint'
-
-plugin 'cocoapods-keys', {
-  :project => '__XCODE_PROJECT_NAME__',
-  :targets => ['__XCODE_PROJECT_NAME__'],
-  :keys => [
-    'exampleKey',
-    'exampleSecret'
-  ]
-}
 
 target '__XCODE_PROJECT_NAME__' do
   use_frameworks!
 
   pod 'Alamofire'
-  pod 'Blackboard'
+  pod 'Valet'
 
   target '__XCODE_PROJECT_NAME__Tests' do
     inherit! :search_paths

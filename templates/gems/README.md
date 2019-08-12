@@ -5,11 +5,6 @@ CocoaPods manages library dependencies for your Xcode project.
 
 https://rubygems.org/gems/cocoapods/
 
-## Cocoapods Keys
-A key value store for environment settings in Cocoa Apps.
-
-https://rubygems.org/gems/cocoapods-keys/
-
 ## Fastlane
 The easiest way to automate beta deployments and releases for your iOS apps
 
