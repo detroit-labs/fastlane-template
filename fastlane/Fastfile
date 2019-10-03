@@ -109,7 +109,7 @@ platform :ios do
     )
   end
   
-  desc "Upload a local IPA to Firebase App Distribution with (app_id) and (group)."
+  desc "Upload a local IPA to Firebase App Distribution with (app_id) and (groups)."
   desc "#### Options"
   desc " * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (boolean – default: `false`)"
   desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"` – default: `\"git\"`)"
@@ -119,7 +119,7 @@ platform :ios do
     options[:changelog_type] ||= "git"
 
     raise "uploadToFirebase: An app ID must be passed as an option (e.g. `\"1:123456789:ios:abcd1234\"`)." unless options[:app_id]
-    raise "uploadToFirebase: A tester group must be passed as an option." unless options[:group]
+    raise "uploadToFirebase: A tester group must be passed as an option." unless options[:groups]
 
     unless options.key?(:release_notes)
       if options[:generate_changelog] == true
@@ -142,8 +142,8 @@ platform :ios do
 
     firebase_app_distribution(
       app: options[:app_id],
-      release_notes: options[:release_notes], # if release_notes is nil, this will be overriden by any generated changelog.
-      testers: options[:group]
+      release_notes: options[:release_notes],
+      groups: options[:groups]
     )
   end
 
