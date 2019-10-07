@@ -1,0 +1,24 @@
+platform :ios, '__IOS_VERSION__'
+
+pod 'Blackboard'
+pod 'SwiftFormat/CLI'
+pod 'SwiftLint'
+
+target '__XCODE_PROJECT_NAME__' do
+  use_frameworks!
+
+  pod 'Alamofire'
+  pod 'Valet'
+
+  target '__XCODE_PROJECT_NAME__Tests' do
+    inherit! :search_paths
+  end
+
+end
+
+post_install do | installer |
+  require 'fileutils'
+  FileUtils.cp_r('Pods/Target Support Files/Pods-__XCODE_PROJECT_NAME__/Pods-__XCODE_PROJECT_NAME__-acknowledgements.plist',
+    '__XCODE_PROJECT_NAME__/Resources/Settings.bundle/Acknowledgements.plist',
+    :remove_destination => true)
+end

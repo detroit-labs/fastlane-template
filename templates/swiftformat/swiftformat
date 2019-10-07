@@ -1,0 +1,25 @@
+# file options
+
+--symlinks ignore
+--exclude Carthage,Pods,__XCODE_PROJECT_NAME__/Source/Generated,__XCODE_PROJECT_NAME__Tests
+
+# format options
+
+--closingparen same-line
+--commas inline
+--comments indent
+--decimalgrouping 3,5
+--exponentcase lowercase
+--exponentgrouping disabled
+--fractiongrouping disabled
+--ifdef outdent
+--importgrouping testable-top
+--ranges no-space
+--stripunusedargs closure-only
+--wraparguments after-first
+--wrapcollections after-first
+
+# rules
+
+--enable isEmpty
+--disable andOperator
