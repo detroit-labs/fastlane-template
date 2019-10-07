@@ -43,13 +43,15 @@ platform :ios do
     options[:configuration] ||= "Release"
     options[:include_bitcode] ||= false
     options[:export_method] ||= "enterprise"
+    options[:export_options] ||= { }
     
     installProfiles
     
     gym(
       configuration: options[:configuration],
       include_bitcode: options[:include_bitcode],
-      export_method: options[:export_method]
+      export_method: options[:export_method],
+      export_options: options[:export_options]
     )
   end
   
