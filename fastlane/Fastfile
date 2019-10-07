@@ -38,7 +38,7 @@ platform :ios do
     increment_build_number(build_number: number_of_commits)
   end
 
-  desc "Build the archive and ipa with options (configuration (Release), include_bitcode (false), export_method (enterprise))."
+  desc "Build the archive and ipa with options (configuration (Release), include_bitcode (false), export_method (enterprise)), export_options ({})."
   lane :build do |options|
     options[:configuration] ||= "Release"
     options[:include_bitcode] ||= false
