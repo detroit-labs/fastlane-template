@@ -43,7 +43,7 @@ platform :ios do
     options[:configuration] ||= "Release"
     options[:include_bitcode] ||= false
     options[:export_method] ||= "enterprise"
-    options[:export_options] ||= { }
+    options[:export_options] ||= {}
     
     installProfiles
     
