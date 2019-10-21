@@ -2,7 +2,7 @@
 
 import Foundation
 
-let branch = "extract-files" // TODO: "master"
+let branch = "master"
 
 let currentDirectoryPath = FileManager.default.currentDirectoryPath
 
