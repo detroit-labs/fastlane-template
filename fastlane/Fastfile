@@ -121,12 +121,15 @@ platform :ios do
   desc " * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (boolean – default: `false`)"
   desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"` – default: `\"git\"`)"
   desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog."
+  desc " * **`firebase_cli_token`**: The Firebase CLI token. (string - default: The `FIREBASE_TOKEN` environment variable.)"
   lane :uploadToFirebase do |options|
     options[:generate_changelog] ||= false
     options[:changelog_type] ||= "git"
+    options[:firebase_cli_token] ||= ENV["FIREBASE_TOKEN"]
 
     raise "uploadToFirebase: An app ID must be passed as an option (e.g. `\"1:123456789:ios:abcd1234\"`)." unless options[:app_id]
     raise "uploadToFirebase: A tester group must be passed as an option." unless options[:groups]
+    raise "uploadToFirebase: A CLI token must be provided, either through the firebase_cli_token parameter or FIREBASE_TOKEN environement variable." unless options[:firebase_cli_token]
 
     unless options.key?(:release_notes)
       if options[:generate_changelog] == true
@@ -148,6 +151,7 @@ platform :ios do
     end
 
     firebase_app_distribution(
+      firebase_cli_token: options[:firebase_cli_token],
       app: options[:app_id],
       release_notes: options[:release_notes],
       groups: options[:groups]
