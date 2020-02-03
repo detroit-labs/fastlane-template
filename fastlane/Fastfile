@@ -74,7 +74,7 @@ platform :ios do
 
           when "pr"
             UI.error("uploadToCrashlytics: Environment variable for PR ID is not set (ghprbPullId).") unless ENV.key?("ghprbPullId")
-            options[:release_notes] = "PR: ##{ENV["ghprbPullId"]} Branch:(#{ENV["GIT_BRANCH"]}) PR Link:#{ENV["ghprbPullLink"]}"
+            options[:release_notes] = "PR: ##{ENV["ghprbPullId"]}\nBranch: (#{ENV["GIT_BRANCH"]})\nPR Link: #{ENV["ghprbPullLink"]}"
 
           when "git"
             changelog_from_git_commits
@@ -139,7 +139,7 @@ platform :ios do
 
           when "pr"
             UI.error("uploadToCrashlytics: Environment variable for PR ID is not set (ghprbPullId).") unless ENV.key?("ghprbPullId")
-            options[:release_notes] = "PR: ##{ENV["ghprbPullId"]} Branch:(#{ENV["GIT_BRANCH"]}) PR Link:#{ENV["ghprbPullLink"]}"
+            options[:release_notes] = "PR: ##{ENV["ghprbPullId"]}\nBranch: (#{ENV["GIT_BRANCH"]})\nPR Link: #{ENV["ghprbPullLink"]}"
 
           when "git"
             changelog_from_git_commits
