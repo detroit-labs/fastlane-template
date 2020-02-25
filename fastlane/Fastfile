@@ -207,13 +207,23 @@ lane :installProfiles do
 end
 
 desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes"
-lane :updateDependencies do
+lane :updateDependencies do |options|
+    options[:branchname] ||= ENV["UPDATE_DEPENDENCIES_BRANCH"]
+    options[:base] ||= "master",
+    options[:pullRequestTitle] ||= "Update Dependencies"
+
     fastlane_require 'fastlane-plugin-git_status'
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 10.2')
+
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 11.3')
     bundle_update if File.exist?("../Gemfile.lock")
     cocoapods_update if File.exist?("../Podfile.lock")
     carthage(command: "update", no_build: true) if File.exist?("../Cartfile.resolved")
-    sendUpdatePullRequest unless git_status.empty?
+
+    sendUpdatePullRequest(
+      branchname: options[:branchname], 
+      base: options[:base],
+      pullRequestTitle: options[:pullRequestTitle]
+    ) unless git_status.empty?
 end
 
 desc "Sends a pull request with the current changes to dependencies"
