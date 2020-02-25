@@ -207,6 +207,10 @@ lane :installProfiles do
 end
 
 desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes"
+desc "#### Options"
+  desc " * **`branchname`**: Accepts an optional value to set the dependency updater branch. If no value is passed in, it will default to the ENV variable name."
+  desc " * **`base`**: Accepts an optional value to set the base branch for the created dependency update PR. If no value is passed in, it will default to master." 
+  desc " * **`pullRequestTitle`**: Accepts an optional value to set the title for the created dependency update PR. If no value is passed in, it will default to Update Dependencies."
 lane :updateDependencies do |options|
     options[:branchname] ||= ENV["UPDATE_DEPENDENCIES_BRANCH"]
     options[:base] ||= "master"
