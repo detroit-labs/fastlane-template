@@ -227,11 +227,16 @@ lane :updateDependencies do |options|
 end
 
 desc "Sends a pull request with the current changes to dependencies"
-lane :sendUpdatePullRequest do
+lane :sendUpdatePullRequest do |options|
+    options[:branchname] ||= ENV["UPDATE_DEPENDENCIES_BRANCH"]
+    options[:base] ||= "master"
+    options[:pullRequestTitle] ||= "Update Dependencies"
+
     fastlane_require 'fastlane-plugin-git_status'
 
-    branchname = ENV["UPDATE_DEPENDENCIES_BRANCH"]
-
+    branchname = options[:branchname]
+    base = options[:base]
+    
     create_git_branch(
       branchname: branchname
     )
@@ -261,8 +266,8 @@ lane :sendUpdatePullRequest do
       api_token: ENV["GITHUB_TOKEN"],
       repo: ENV["GITHUB_REPO"],
       head: branchname,
-      base: "master",
-      title: "Update Dependencies"
+      base: base,
+      title: options[:pullRequestTitle]
     )
 end
 
