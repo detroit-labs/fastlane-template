@@ -209,7 +209,7 @@ end
 desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes"
 lane :updateDependencies do |options|
     options[:branchname] ||= ENV["UPDATE_DEPENDENCIES_BRANCH"]
-    options[:base] ||= "master",
+    options[:base] ||= "master"
     options[:pullRequestTitle] ||= "Update Dependencies"
 
     fastlane_require 'fastlane-plugin-git_status'
@@ -220,7 +220,7 @@ lane :updateDependencies do |options|
     carthage(command: "update", no_build: true) if File.exist?("../Cartfile.resolved")
 
     sendUpdatePullRequest(
-      branchname: options[:branchname], 
+      branchname: options[:branchname],
       base: options[:base],
       pullRequestTitle: options[:pullRequestTitle]
     ) unless git_status.empty?
