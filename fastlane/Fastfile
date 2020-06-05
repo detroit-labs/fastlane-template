@@ -16,12 +16,14 @@ platform :ios do
     cleanup(options)
     removeKeychainsIfPossible
   end
-  
+
   desc "Runs all the tests."
   lane :runTests do
-    scan(output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone 11 Pro (13.4)'
-    )
+    simctl(type: ENV["DEVICE"] || 'iPhone 11 Pro',
+           block: lambda { |other_action, device|
+      other_action.scan(output_types: "junit",
+                        device: device.name)
+    })
   end
 
   desc "Sets the version number to the given version or, if none is given, increments it."
