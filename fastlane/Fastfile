@@ -24,7 +24,7 @@ platform :ios do
 
     type = ENV["SCAN_DEVICE"] || ENV["DEVICE"] || 'iPhone 11 Pro'
     simctl(type: type,
-           name: (ENV["SCAN_SCHEME"] || ENV["SCHEME"]) + SecureRandom.uuid
+           name: (ENV["SCAN_SCHEME"] || ENV["SCHEME"]) + SecureRandom.uuid,
            block: lambda { |other_action, device|
       other_action.scan(output_types: "junit",
                         device: device.name)
