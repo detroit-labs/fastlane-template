@@ -19,6 +19,7 @@ platform :ios do
 
   desc "Runs all the tests."
   lane :runTests do
+    fastlane_require 'fastlane-plugin-simctl'
     simctl(type: ENV["DEVICE"] || 'iPhone 11 Pro',
            block: lambda { |other_action, device|
       other_action.scan(output_types: "junit",
