@@ -20,15 +20,17 @@ platform :ios do
   desc "Runs all the tests."
   lane :runTests do
     fastlane_require 'fastlane-plugin-simctl'
-    require SecureRandom
 
-    type = ENV["SCAN_DEVICE"] || ENV["DEVICE"] || 'iPhone 11 Pro'
-    simctl(type: type,
-           name: (ENV["SCAN_SCHEME"] || ENV["SCHEME"]) + SecureRandom.uuid,
-           block: lambda { |other_action, device|
-      other_action.scan(output_types: "junit",
-                        device: device.name)
-    })
+    devices = ENV["SCAN_DEVICES"] || ENV["DEVICES"] || (ENV["SCAN_DEVICE"] || ENV["DEVICE"]) || "iPhone 11"
+
+    devices.split(",").each do |device|
+      simctl(type: device,
+             name: (ENV["SCAN_SCHEME"] || ENV["SCHEME"] || File.basename(File.expand_path('..'))) + '-' + SecureRandom.uuid,
+             block: lambda { |other_action, device|
+        other_action.scan(output_types: "junit",
+                          devices: [device.name])
+      })
+    end
   end
 
   desc "Sets the version number to the given version or, if none is given, increments it."
