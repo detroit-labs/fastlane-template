@@ -1,4 +1,4 @@
-fastlane_version "2.109.0"
+fastlane_version "2.190.0"
 
 default_platform :ios
 
@@ -6,7 +6,7 @@ platform :ios do
 
   before_all do
     installKeychainsIfPossible
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 11.4')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 12.5')
     if !ENV["SKIP_COCOAPODS"]
       cocoapods(silent: true, try_repo_update_on_error: true)
     end
@@ -20,7 +20,7 @@ platform :ios do
   desc "Runs all the tests."
   lane :runTests do
     scan(output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone 11 Pro (13.4)'
+      device: ENV["DEVICE"] || 'iPhone 12 Pro (14.5)'
     )
   end
 
@@ -208,17 +208,17 @@ end
 
 desc "Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes"
 desc "#### Options"
-  desc " * **`branchname`**: Accepts an optional value to set the dependency updater branch. If no value is passed in, it will default to the ENV variable name."
-  desc " * **`base`**: Accepts an optional value to set the base branch for the created dependency update PR. If no value is passed in, it will default to master." 
+  desc " * **`branchname`**: Accepts an optional value to set the dependency updater branch. If no value is passed in, it will use the UPDATE_DEPENDENCIES_BRANCH environment variable, or default to jenkins-update-dependencies if it doesn't exit."
+  desc " * **`base`**: Accepts an optional value to set the base branch for the created dependency update PR. If no value is passed in, it will default to main." 
   desc " * **`pullRequestTitle`**: Accepts an optional value to set the title for the created dependency update PR. If no value is passed in, it will default to Update Dependencies."
 lane :updateDependencies do |options|
-    options[:branchname] ||= ENV["UPDATE_DEPENDENCIES_BRANCH"]
-    options[:base] ||= "master"
+    options[:branchname] ||= ENV["UPDATE_DEPENDENCIES_BRANCH"] ||= "jenkins-update-dependencies"
+    options[:base] ||= "main"
     options[:pullRequestTitle] ||= "Update Dependencies"
 
     fastlane_require 'fastlane-plugin-git_status'
 
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 11.3')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 12.5')
     bundle_update if File.exist?("../Gemfile.lock")
     cocoapods_update if File.exist?("../Podfile.lock")
     carthage(command: "update", no_build: true) if File.exist?("../Cartfile.resolved")
@@ -372,4 +372,17 @@ lane :removeKeychain do |options|
   
   UI.message("Deleting keychain named #{copy_name}...")
   delete_keychain(name: copy_name)
+end
+
+desc "Run SwiftFormat from CocoaPods"
+lane :format do
+  if File.exist?("../.swiftformat")
+    if File.exist?("../Pods/SwiftFormat/CommandLineTool/swiftformat")
+      sh "../Pods/SwiftFormat/CommandLineTool/swiftformat ../"
+    else
+      puts "SwiftFormat not found, please install the SwiftFormat/CLI pod."
+    end
+  else
+    puts ".swiftformat file not found, please create one."
+  end
 end
