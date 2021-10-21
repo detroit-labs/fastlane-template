@@ -6,7 +6,8 @@ platform :ios do
 
   before_all do
     installKeychainsIfPossible
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 12.5')
+    installProfiles
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 13.0')
     if !ENV["SKIP_COCOAPODS"]
       cocoapods(silent: true, try_repo_update_on_error: true)
     end
@@ -19,23 +20,10 @@ platform :ios do
   
   desc "Runs all the tests."
   lane :runTests do
-    scan(output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone 12 Pro (14.5)'
+    scan(
+      output_types: "junit",
+      device: ENV["DEVICE"] || 'iPhone 13 Pro (15.0)'
     )
-  end
-
-  desc "Sets the version number to the given version or, if none is given, increments it."
-  lane :incrementBuildNumber do |options|
-    if options[:build].nil?
-      increment_build_number
-    else
-      increment_build_number(build_number: options[:build])
-    end
-  end
-
-  desc "Sets the build number to the current commit count."
-  lane :setBuildNumberToCommitCount do
-    increment_build_number(build_number: number_of_commits)
   end
 
   desc "Build the archive and ipa with options (configuration (Release), include_bitcode (false), export_method (enterprise)), export_options ({})."
@@ -54,99 +42,79 @@ platform :ios do
       export_options: options[:export_options]
     )
   end
-  
-  desc "Upload a local IPA to Crashlytics with (group)."
+
+  desc "Build and upload to Firebase with (configuration (Release)), (include_bitcode (false)), (export_method (enterprise)), (export_options ({})) and (group)."
   desc "#### Options"
-  desc " * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (boolean – default: `false`)"
-  desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"` – default: `\"git\"`)"
-  desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog."
-  lane :uploadToCrashlytics do |options|
-    options[:generate_changelog] ||= false
-    options[:changelog_type] ||= "git"
-
-    raise "uploadToCrashlytics: A Crashlytics group must be passed as an option." unless options[:group]
-
-    unless options.key?(:release_notes)
-      if options[:generate_changelog] == true
-        case options[:changelog_type]
-          when "jenkins"
-            make_changelog_from_jenkins
-
-          when "pr"
-            UI.error("uploadToCrashlytics: Environment variable for PR ID is not set (ghprbPullId).") unless ENV.key?("ghprbPullId")
-            options[:release_notes] = "PR: ##{ENV["ghprbPullId"]}\nBranch: (#{ENV["GIT_BRANCH"]})\nPR Link: #{ENV["ghprbPullLink"]}"
-
-          when "git"
-            changelog_from_git_commits
-
-          else 
-            UI.error("Unrecognized changelog_type: #{options[:changelog_type]}")
-        end
-      end
-    end
-    
-    crashlytics(
-      groups: options[:group],
-      notes: options[:release_notes], # if release_notes is nil, this will be overriden by any generated changelog.
-      notifications: true
-    )
-  end
-
-  desc "Build and upload to Crashlytics with (configuration (Release)), (include_bitcode (false)), (export_method (enterprise)), (export_options ({})) and (group)."
+  desc " * **`configuration`**: Build configuration to use. (Default: `Release`)"
+  desc " * **`include_bitcode`**: Whether or not to build with bitcode enabled. (Default: `false`)"
+  desc " * **`export_method`**: Export method to use. See `fastlane action gym` for options. (Default: `enterprise`)"
+  desc " * **`export_options`**: Custom export options to use (Default: `{}`)"
+  desc " * **`changelog_type`**: Type of changelog to generate, if any. Possible values are jenkins, pr, git, or none. (Default: `none`)"
+  desc " * **`release_notes`**: Release notes for the release, if not using a changelog_type. (Default: `nil`)"
   lane :beta do |options|
     options[:configuration] ||= "Release"
     options[:include_bitcode] ||= false
     options[:export_method] ||= "enterprise"
-    options[:generate_changelog] ||= false
+    options[:changelog_type] ||= "none"
     options[:export_options] ||= {}
 
-    raise "beta: A Crashlytics group must be passed as an option." unless options[:group]
-
-    build(configuration: options[:configuration], 
+    build(
+      configuration: options[:configuration], 
       include_bitcode: options[:include_bitcode], 
       export_method: options[:export_method],
       export_options: options[:export_options]
     )
-
-    uploadToCrashlytics(
-      group: options[:group], 
-      generate_changelog: options[:generate_changelog], 
-      changelog_type: options[:changelog_type], 
+    
+    uploadToFirebase(
+      changelog_type: options[:changelog_type],
       release_notes: options[:release_notes]
     )
   end
   
+  desc "Increments the build number, builds, uploads to Firebase, and commits the updated build number."
+  lane :betaBumpingBuildNumber |options| do
+    options[:group] ||= ENV["CRASHLYTICS_QA_GROUP"]
+    incrementBuildNumber
+    
+    raise "betaQA: A Firebase group must be provided through the CRASHLYTICS_QA_GROUP environment variable." unless ENV["CRASHLYTICS_QA_GROUP"]
+    
+    beta(group: options[:group])
+    
+    commit_version_bump(message: "Automatically bumping build number to #{lane_context[SharedValues::BUILD_NUMBER]}.")
+    push_to_git_remote
+  end
+
   desc "Upload a local IPA to Firebase App Distribution with (app_id) and (groups)."
   desc "#### Options"
-  desc " * **`generate_changelog`**: Whether or not to generate a changelog as the release notes (boolean – default: `false`)"
   desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"` – default: `\"git\"`)"
   desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog."
   desc " * **`firebase_cli_token`**: The Firebase CLI token. (string - default: The `FIREBASE_TOKEN` environment variable.)"
   lane :uploadToFirebase do |options|
-    options[:generate_changelog] ||= false
-    options[:changelog_type] ||= "git"
+    options[:changelog_type] ||= "none"
+    options[:app_id] ||= ENV["FIREBASE_APP_ID"]
     options[:firebase_cli_token] ||= ENV["FIREBASE_TOKEN"]
 
     raise "uploadToFirebase: An app ID must be passed as an option (e.g. `\"1:123456789:ios:abcd1234\"`)." unless options[:app_id]
     raise "uploadToFirebase: A tester group must be passed as an option." unless options[:groups]
-    raise "uploadToFirebase: A CLI token must be provided, either through the firebase_cli_token parameter or FIREBASE_TOKEN environement variable." unless options[:firebase_cli_token]
+    raise "uploadToFirebase: A CLI token must be provided, either through the firebase_cli_token parameter or FIREBASE_TOKEN environment variable." unless options[:firebase_cli_token]
 
     unless options.key?(:release_notes)
-      if options[:generate_changelog] == true
-        case options[:changelog_type]
-          when "jenkins"
-            make_changelog_from_jenkins
+      case options[:changelog_type]
+        when "jenkins"
+          make_changelog_from_jenkins
 
-          when "pr"
-            UI.error("uploadToCrashlytics: Environment variable for PR ID is not set (ghprbPullId).") unless ENV.key?("ghprbPullId")
-            options[:release_notes] = "PR: ##{ENV["ghprbPullId"]}\nBranch: (#{ENV["GIT_BRANCH"]})\nPR Link: #{ENV["ghprbPullLink"]}"
+        when "pr"
+          UI.error("uploadToFirebase: Environment variable for PR ID is not set (ghprbPullId).") unless ENV.key?("ghprbPullId")
+          options[:release_notes] = "PR: ##{ENV["ghprbPullId"]}\nBranch: (#{ENV["GIT_BRANCH"]})\nPR Link: #{ENV["ghprbPullLink"]}"
 
-          when "git"
-            changelog_from_git_commits
+        when "git"
+          changelog_from_git_commits
+          
+        when "none"
+          break
 
-          else
-            UI.error("Unrecognized changelog_type: #{options[:changelog_type]}")
-        end
+        else
+          UI.error("Unrecognized changelog_type: #{options[:changelog_type]}")
       end
     end
 
@@ -157,19 +125,56 @@ platform :ios do
       groups: options[:groups]
     )
   end
-
-  # Custom actions
   
-  desc "Builds and uploads to Crashlytics a QA build."
-  lane :betaQA do
-    incrementBuildNumber
+  lane :createGitHubRelease do |options|
+    options[:repository_name] ||= ENV["GITHUB_REPO"]
+    options[:api_token] ||= ENV["GITHUB_API_TOKEN"]
     
-    raise "betaQA: A Crashlytics group must be provided through the CRASHLYTICS_QA_GROUP environment variable." unless ENV["CRASHLYTICS_QA_GROUP"]
+    # Add required variable checks.
     
-    beta(group: ENV["CRASHLYTICS_QA_GROUP"])
+    get_version_number
     
-    commit_version_bump(message: "Automatically bumping build number to #{lane_context[SharedValues::BUILD_NUMBER]}.")
-    push_to_git_remote
+    set_github_release(
+      repository_name: options[:repository_name],
+      api_token: options[:api_token],
+      name: "v#{lane_context[SharedValues::VERSION_NUMBER]}",
+      description: "v#{lane_context[SharedValues::VERSION_NUMBER]}, build: #{lane_context[SharedValues::BUILD_NUMBER]}",
+      tag_name: "v#{lane_context[SharedValues::VERSION_NUMBER]}",
+      upload_assets: ["#{lane_context[SharedValues::IPA_OUTPUT_PATH]}", "#{lane_context[SharedValues::DSYM_OUTPUT_PATH]}"]
+    )
+  end
+
+  desc "Sets the build number to the given value or, if none is provided, automatically sets the build number according to the strategy provided."
+  lane :incrementBuildNumber do |options|
+    options[:strategy] ||= "none"
+    
+    if options.key?(:build)
+      increment_build_number(build_number: options[:build])
+    else
+      case options[:strategy]
+        when "commits"
+          setBuildNumberToCommitCount
+          
+        when "timestamp"
+          setBuildNumberToTimestamp
+          
+        when "none"
+          increment_build_number
+          
+        else
+          UI.error("Unrecognized strategy: #{options[:strategy]}")
+      end
+    end
+  end
+
+  desc "Sets the build number to the current commit count."
+  lane :setBuildNumberToCommitCount do
+    increment_build_number(build_number: number_of_commits)
+  end
+  
+  desc "Set the build number to a Unix timestamp."
+  lane :setBuildNumberToTimeStamp do
+    increment_build_number(build_number: "#{Time.now.to_i}")
   end
   
   desc "Deletes the archive generated by gym."
@@ -179,7 +184,7 @@ platform :ios do
     end
   end
   
-  desc "Kills the simulator and background process."
+  desc "Shuts down and kills the simulator and background process."
   lane :cleanupSimulator do
     # attempt to quit simulators nicely
     sh "xcrun simctl shutdown booted"
