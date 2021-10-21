@@ -72,7 +72,7 @@ platform :ios do
   end
   
   desc "Increments the build number, builds, uploads to Firebase, and commits the updated build number."
-  lane :betaBumpingBuildNumber |options| do
+  lane :betaBumpingBuildNumber do |options|
     options[:group] ||= ENV["CRASHLYTICS_QA_GROUP"]
     incrementBuildNumber
     
