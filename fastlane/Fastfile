@@ -166,7 +166,7 @@ platform :ios do
 
   desc "Sets the build number to the given value or, if none is provided, automatically sets the build number according to the strategy provided."
   lane :incrementBuildNumber do |options|
-    options[:strategy] ||= "none"
+    options[:strategy] ||= "default"
 
     if options.key?(:build)
       increment_build_number(build_number: options[:build])
@@ -178,9 +178,8 @@ platform :ios do
         when "timestamp"
           setBuildNumberToTimestamp
 
-        when "none"
-          UI.message("incrementBuildNumber called with strategy of none, skipping increment.")
-          break
+        when "default"
+          increment_build_number
 
         else
           raise "Unrecognized incrementBuildNumber strategy: #{options[:strategy]}"
