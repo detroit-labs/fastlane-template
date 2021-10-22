@@ -159,7 +159,7 @@ platform :ios do
     options[:tag_name] ||= "v#{lane_context[SharedValues::VERSION_NUMBER]}"
 
     branch = git_branch
-    branch.sub("origin/", "")
+    branch.delete('origin/')
     UI.message("Branch: #{branch}")
     set_github_release(
       repository_name: options[:repository_name],
