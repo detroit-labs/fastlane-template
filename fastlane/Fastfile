@@ -124,6 +124,10 @@ platform :ios do
       release_notes: options[:release_notes],
       groups: options[:groups]
     )
+
+    upload_symbols_to_crashlytics(
+      app_id: options[:app_id]
+    )
   end
 
   desc "Create and tag a GitHub release and attach any built IPA and dSYM to the release. This must be performed on the main branch."
