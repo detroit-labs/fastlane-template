@@ -146,8 +146,13 @@ platform :ios do
     raise "A respository_name is required. Provide the GITHUB_REPO environment variable or a value directly." unless options[:repository_name]
     raise "An api_token is required. Provide the GITHUB_API_TOKEN environment variable from secure storage or a value directly." unless options[:api_token]
 
-    get_version_number
-    get_build_number
+    unless lane_context[SharedValues::VERSION_NUMBER]
+      get_version_number
+    end
+
+    unless lane_context[SharedValues::BUILD_NUMBER]
+      get_build_number
+    end
 
     options[:name] ||= "v#{lane_context[SharedValues::VERSION_NUMBER]}"
     options[:description] ||= "v#{lane_context[SharedValues::VERSION_NUMBER]}, build: #{lane_context[SharedValues::BUILD_NUMBER]}"
