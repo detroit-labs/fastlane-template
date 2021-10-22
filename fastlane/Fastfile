@@ -160,7 +160,7 @@ platform :ios do
 
     full_branch = git_branch
     branch = full_branch.sub('origin/', '')
-    UI.message("Branch: #{new_branch}")
+
     set_github_release(
       repository_name: options[:repository_name],
       api_token: options[:api_token],
