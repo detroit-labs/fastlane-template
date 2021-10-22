@@ -145,7 +145,6 @@ platform :ios do
 
     raise "A respository_name is required. Provide the GITHUB_REPO environment variable or a value directly." unless options[:repository_name]
     raise "An api_token is required. Provide the GITHUB_API_TOKEN environment variable from secure storage or a value directly." unless options[:api_token]
-    raise "This action must be performed on the main branch." unless ("#{ENV["GIT_BRANCH"]}" == "main")
 
     get_version_number
     get_build_number
