@@ -32,6 +32,7 @@ platform :ios do
     options[:include_bitcode] ||= false
     options[:export_method] ||= "enterprise"
     options[:export_options] ||= {}
+    options[:output_name] ||= nil
     
     installProfiles
     
@@ -39,7 +40,8 @@ platform :ios do
       configuration: options[:configuration],
       include_bitcode: options[:include_bitcode],
       export_method: options[:export_method],
-      export_options: options[:export_options]
+      export_options: options[:export_options],
+      output_name: options[:output_name]
     )
   end
 
