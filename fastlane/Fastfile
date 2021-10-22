@@ -106,7 +106,7 @@ platform :ios do
           make_changelog_from_jenkins
 
         when "pr"
-          UI.error("uploadToFirebase: Environment variable for PR ID is not set (ghprbPullId).") unless ENV.key?("ghprbPullId")
+          raise "uploadToFirebase: Environment variable for PR ID is not set (ghprbPullId)." unless ENV.key?("ghprbPullId")
           options[:release_notes] = "PR: ##{ENV["ghprbPullId"]}\nBranch: (#{ENV["GIT_BRANCH"]})\nPR Link: #{ENV["ghprbPullLink"]}"
 
         when "git"
@@ -116,7 +116,7 @@ platform :ios do
           break
 
         else
-          UI.error("Unrecognized changelog_type: #{options[:changelog_type]}")
+          raise "Unrecognized changelog_type: #{options[:changelog_type]}"
       end
     end
 
@@ -127,20 +127,30 @@ platform :ios do
       groups: options[:groups]
     )
   end
-  
+
+  desc "Create and tag a GitHub release and attach any built IPA and dSYM to the release. This must be performed on the main branch."
+  desc "Adds the IPA and dSYM files using the IPA_OUTPUT_PATH and DSYM_OUTPUT_PATH from earlier builds, like gym. Customize those outputs if you want custom file names."
+  desc "#### Options"
+  desc " * **`repository_name`**: Name of the repo for the release. (Default: `GITHUB_REPO` environment variable.)"
+  desc " * **`api_token`**: A string to set as the release notes; overrides any generated changelog."
+  desc " * **`name`**: Name for the release. (Default: `v<version_number>`)"
+  desc " * **`description`**: Description for the release. (Default: `v<version_number>, build: <build_number>`)"
+  desc " * **`tag_name`**: Tag name for the release. (Default: `v<version_number>`)"
   lane :createGitHubRelease do |options|
     options[:repository_name] ||= ENV["GITHUB_REPO"]
     options[:api_token] ||= ENV["GITHUB_API_TOKEN"]
-    
-    
-    # Add required variable checks.
-    
+
+    raise "A respository_name is required. Provide the GITHUB_REPO environment variable or a value directly." unless options[:repository_name]
+    raise "An api_token is required. Provide the GITHUB_API_TOKEN environment variable from secure storage or a value directly." unless options[:api_token]
+    raise "This action must be performed on the main branch." unless ("#{ENV["GIT_BRANCH"]}" == "main")
+
     get_version_number
-    
+    get_build_number
+
     options[:name] ||= "v#{lane_context[SharedValues::VERSION_NUMBER]}"
     options[:description] ||= "v#{lane_context[SharedValues::VERSION_NUMBER]}, build: #{lane_context[SharedValues::BUILD_NUMBER]}"
     options[:tag_name] ||= "v#{lane_context[SharedValues::VERSION_NUMBER]}"
-    
+
     set_github_release(
       repository_name: options[:repository_name],
       api_token: options[:api_token],
@@ -154,22 +164,22 @@ platform :ios do
   desc "Sets the build number to the given value or, if none is provided, automatically sets the build number according to the strategy provided."
   lane :incrementBuildNumber do |options|
     options[:strategy] ||= "none"
-    
+
     if options.key?(:build)
       increment_build_number(build_number: options[:build])
     else
       case options[:strategy]
         when "commits"
           setBuildNumberToCommitCount
-          
+
         when "timestamp"
           setBuildNumberToTimestamp
-          
+
         when "none"
           increment_build_number
-          
+
         else
-          UI.error("Unrecognized strategy: #{options[:strategy]}")
+          raise "Unrecognized incrementBuildNumber strategy: #{options[:strategy]}"
       end
     end
   end
@@ -190,7 +200,7 @@ platform :ios do
       sh "rm -r \"#{File.dirname(lane_context[SharedValues::XCODEBUILD_ARCHIVE])}\" || :"
     end
   end
-  
+
   desc "Shuts down and kills the simulator and background process."
   lane :cleanupSimulator do
     # attempt to quit simulators nicely
@@ -200,19 +210,18 @@ platform :ios do
     # kill SimulatorService
     sh "killall -9 com.apple.CoreSimulator.CoreSimulatorService || :"
   end
-  
+
   desc "Cleanup simulator and build archives."
   lane :cleanup do |options|
     cleanupSimulator
     cleanupArchive(options)
   end
-  
 end
 
 desc "Installs any provisioning profiles in $PROFILE_DIRECTORY, relative to Fastlane's execution path."
 lane :installProfiles do
   raise "installProfiles: PROFILE_DIRECTORY environment variable required." unless ENV["PROFILE_DIRECTORY"]
-  
+
   Dir.glob("#{ENV["PROFILE_DIRECTORY"]}/*.mobileprovision") do |profile|
     FastlaneCore::ProvisioningProfile.install(profile)
   end
@@ -230,7 +239,7 @@ lane :updateDependencies do |options|
 
     fastlane_require 'fastlane-plugin-git_status'
 
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 12.5')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 13.0')
     bundle_update if File.exist?("../Gemfile.lock")
     cocoapods_update if File.exist?("../Podfile.lock")
     carthage(command: "update", no_build: true) if File.exist?("../Cartfile.resolved")
@@ -283,7 +292,8 @@ lane :sendUpdatePullRequest do |options|
       repo: ENV["GITHUB_REPO"],
       head: branchname,
       base: base,
-      title: options[:pullRequestTitle]
+      title: options[:pullRequestTitle],
+      body: "Updated dependencies."
     )
 end
 
