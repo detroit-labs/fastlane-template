@@ -111,6 +111,7 @@ platform :ios do
           changelog_from_git_commits
           
         when "none"
+          UI.message("uploadToFirebase called with a changelog_type of none.")
           break
 
         else
