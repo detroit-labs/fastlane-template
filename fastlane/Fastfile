@@ -132,16 +132,21 @@ platform :ios do
     options[:repository_name] ||= ENV["GITHUB_REPO"]
     options[:api_token] ||= ENV["GITHUB_API_TOKEN"]
     
+    
     # Add required variable checks.
     
     get_version_number
     
+    options[:name] ||= "v#{lane_context[SharedValues::VERSION_NUMBER]}"
+    options[:description] ||= "v#{lane_context[SharedValues::VERSION_NUMBER]}, build: #{lane_context[SharedValues::BUILD_NUMBER]}"
+    options[:tag_name] ||= "v#{lane_context[SharedValues::VERSION_NUMBER]}"
+    
     set_github_release(
       repository_name: options[:repository_name],
       api_token: options[:api_token],
-      name: "v#{lane_context[SharedValues::VERSION_NUMBER]}",
-      description: "v#{lane_context[SharedValues::VERSION_NUMBER]}, build: #{lane_context[SharedValues::BUILD_NUMBER]}",
-      tag_name: "v#{lane_context[SharedValues::VERSION_NUMBER]}",
+      name: options[:name],
+      description: options[:description],
+      tag_name: options[:tag_name],
       upload_assets: ["#{lane_context[SharedValues::IPA_OUTPUT_PATH]}", "#{lane_context[SharedValues::DSYM_OUTPUT_PATH]}"]
     )
   end
