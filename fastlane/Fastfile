@@ -178,7 +178,8 @@ platform :ios do
           setBuildNumberToTimestamp
 
         when "none"
-          increment_build_number
+          UI.message("incrementBuildNumber called with strategy of none, skipping increment.")
+          break
 
         else
           raise "Unrecognized incrementBuildNumber strategy: #{options[:strategy]}"
