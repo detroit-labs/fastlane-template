@@ -129,7 +129,7 @@ Upload a local IPA to Firebase App Distribution with (app_id) and (groups).
 
 #### Options
 
- * **`changelog_type`**: The type of changelog to generate (e.g. `"git"`, `"jenkins"`, `"pr"` – default: `"git"`)
+ * **`changelog_type`**: The type of changelog to generate (e.g. `"git"`, `"jenkins"`, `"pr"`, "none" – default: `"none"`)
 
  * **`release_notes`**: A string to set as the release notes; overrides any generated changelog.
 

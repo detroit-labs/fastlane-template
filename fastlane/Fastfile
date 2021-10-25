@@ -86,7 +86,7 @@ platform :ios do
 
   desc "Upload a local IPA to Firebase App Distribution with (app_id) and (groups)."
   desc "#### Options"
-  desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"` – default: `\"git\"`)"
+  desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"`, \"none\" – default: `\"none\"`)"
   desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog."
   desc " * **`firebase_cli_token`**: The Firebase CLI token. (string - default: The `FIREBASE_TOKEN` environment variable.)"
   lane :uploadToFirebase do |options|
