@@ -29,7 +29,7 @@ platform :ios do
   desc "Build the archive and ipa with options (configuration (Release), include_bitcode (false), export_method (enterprise)), export_options ({})."
   lane :build do |options|
     options[:configuration] ||= "Release"
-    options[:include_bitcode] ||= false
+    options[:include_bitcode] = false if options[:include_bitcode].nil?
     options[:export_method] ||= "enterprise"
     options[:export_options] ||= {}
     options[:output_name] ||= nil
@@ -57,12 +57,12 @@ platform :ios do
   desc " * **`FIREBASE_APP_ID`**: Firebase app ID. Should be passed as a secure text value. Required."
   desc " * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required."
   lane :beta do |options|
-    options[:configuration] ||= "Release"
-    options[:include_bitcode] ||= false
+    options[:configuration] = "Release"
+    options[:include_bitcode] = false if options[:include_bitcode].nil?
     options[:export_method] ||= "enterprise"
     options[:changelog_type] ||= "none"
     options[:export_options] ||= {}
-    options[:upload_symbols] ||= true
+    options[:upload_symbols] = true if options[:upload_symbols].nil?
 
     build(
       configuration: options[:configuration], 
@@ -90,7 +90,7 @@ platform :ios do
   desc " * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required."
   lane :uploadToFirebase do |options|
     options[:changelog_type] ||= "none"
-    options[:upload_symbols] ||= true
+    options[:upload_symbols] = true if options[:upload_symbols].nil?
     options[:app_id] ||= ENV["FIREBASE_APP_ID"]
     options[:firebase_cli_token] ||= ENV["FIREBASE_TOKEN"]
 
