@@ -126,7 +126,7 @@ platform :ios do
       groups: options[:groups]
     )
 
-    if upload_symbols
+    if options[:upload_symbols]
       upload_symbols_to_crashlytics(
         app_id: options[:app_id]
       )
