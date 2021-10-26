@@ -28,9 +28,9 @@ platform :ios do
 
   desc "Build the archive and ipa with options (configuration (Release), include_bitcode (false), export_method (enterprise)), export_options ({})."
   lane :build do |options|
-    options[:configuration] ||= "Release"
+    options[:configuration] ||= ENV["GYM_CONFIGURATION"] ||= "Release"
     options[:include_bitcode] = false if options[:include_bitcode].nil?
-    options[:export_method] ||= "enterprise"
+    options[:export_method] ||= ENV["GYM_EXPORT_METHOD"] ||= "enterprise"
     options[:export_options] ||= {}
     options[:output_name] ||= nil
 
@@ -46,9 +46,9 @@ platform :ios do
   desc "Build and upload to Firebase with (configuration (Release)), (include_bitcode (false)), (export_method (enterprise)), (export_options ({})) and (group)."
   desc "#### Options"
   desc " * **`groups`**: Firebase distribution groups to notify of release. Required. (Default: `nil`)"
-  desc " * **`configuration`**: Build configuration to use. (Default: `Release`)"
+  desc " * **`configuration`**: Build configuration to use. (Default: `ENV[\"GYM_CONFIGURATION\"]` or `Release`)"
   desc " * **`include_bitcode`**: Whether or not to build with bitcode enabled. (Default: `false`)"
-  desc " * **`export_method`**: Export method to use. See `fastlane action gym` for options. (Default: `enterprise`)"
+  desc " * **`export_method`**: Export method to use. See `fastlane action gym` for options. (Default: `ENV[\"GYM_EXPORT_METHOD\"]` or `enterprise`)"
   desc " * **`export_options`**: Custom export options to use (Default: `{}`)"
   desc " * **`changelog_type`**: Type of changelog to generate, if any. Possible values are jenkins, pr, git, or none. (Default: `none`)"
   desc " * **`release_notes`**: Release notes for the release, if not using a changelog_type. (Default: `nil`)"
@@ -57,9 +57,9 @@ platform :ios do
   desc " * **`FIREBASE_APP_ID`**: Firebase app ID. Should be passed as a secure text value. Required."
   desc " * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required."
   lane :beta do |options|
-    options[:configuration] = "Release"
+    options[:configuration] ||= ENV["GYM_CONFIGURATION"] ||= "Release"
     options[:include_bitcode] = false if options[:include_bitcode].nil?
-    options[:export_method] ||= "enterprise"
+    options[:export_method] ||= ENV["GYM_EXPORT_METHOD"] ||= "enterprise"
     options[:changelog_type] ||= "none"
     options[:export_options] ||= {}
     options[:upload_symbols] = true if options[:upload_symbols].nil?
