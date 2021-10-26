@@ -197,7 +197,7 @@ platform :ios do
   end
   
   desc "Set the build number to a Unix timestamp."
-  lane :setBuildNumberToTimeStamp do
+  lane :setBuildNumberToTimestamp do
     increment_build_number(build_number: "#{Time.now.to_i}")
   end
   
