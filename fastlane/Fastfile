@@ -52,6 +52,7 @@ platform :ios do
   desc " * **`export_options`**: Custom export options to use (Default: `{}`)"
   desc " * **`changelog_type`**: Type of changelog to generate, if any. Possible values are jenkins, pr, git, or none. (Default: `none`)"
   desc " * **`release_notes`**: Release notes for the release, if not using a changelog_type. (Default: `nil`)"
+  desc " * **`upload_symbols`**: Whether or not to upload symbols to Firebase. Requires FirebaseCrashlytics pod to be installed. (Default: `true`)"
   desc "#### Environment Variables"
   desc " * **`FIREBASE_APP_ID`**: Firebase app ID. Should be passed as a secure text value. Required."
   desc " * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required."
@@ -61,6 +62,7 @@ platform :ios do
     options[:export_method] ||= "enterprise"
     options[:changelog_type] ||= "none"
     options[:export_options] ||= {}
+    options[:upload_symbols] ||= true
 
     build(
       configuration: options[:configuration], 
@@ -72,6 +74,7 @@ platform :ios do
     uploadToFirebase(
       changelog_type: options[:changelog_type],
       release_notes: options[:release_notes],
+      upload_symbols: options[:upload_symbols],
       groups: options[:groups]
     )
   end
@@ -79,6 +82,7 @@ platform :ios do
   desc "Upload a local IPA and dSYM to Firebase App Distribution."
   desc "#### Options"
   desc " * **`groups`**: Firebase distribution groups to notify of release. Required. (Default: `nil`)"
+  desc " * **`upload_symbols`**: Whether or not to upload symbols to Firebase. Requires FirebaseCrashlytics pod to be installed. (Default: `true`)"
   desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"`, \"none\") (Default: `\"none\"`)"
   desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog. (Default: `nil`)"
   desc "#### Environment Variables"
@@ -86,6 +90,7 @@ platform :ios do
   desc " * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required."
   lane :uploadToFirebase do |options|
     options[:changelog_type] ||= "none"
+    options[:upload_symbols] ||= true
     options[:app_id] ||= ENV["FIREBASE_APP_ID"]
     options[:firebase_cli_token] ||= ENV["FIREBASE_TOKEN"]
 
@@ -121,9 +126,11 @@ platform :ios do
       groups: options[:groups]
     )
 
-    upload_symbols_to_crashlytics(
-      app_id: options[:app_id]
-    )
+    if upload_symbols
+      upload_symbols_to_crashlytics(
+        app_id: options[:app_id]
+      )
+    end
   end
 
   desc "Create and tag a GitHub release and attach any built IPA and dSYM to the release. This will be performed on the current branch."
