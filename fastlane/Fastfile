@@ -45,12 +45,16 @@ platform :ios do
 
   desc "Build and upload to Firebase with (configuration (Release)), (include_bitcode (false)), (export_method (enterprise)), (export_options ({})) and (group)."
   desc "#### Options"
+  desc " * **`groups`**: Firebase distribution groups to notify of release. Required. (Default: `nil`)"
   desc " * **`configuration`**: Build configuration to use. (Default: `Release`)"
   desc " * **`include_bitcode`**: Whether or not to build with bitcode enabled. (Default: `false`)"
   desc " * **`export_method`**: Export method to use. See `fastlane action gym` for options. (Default: `enterprise`)"
   desc " * **`export_options`**: Custom export options to use (Default: `{}`)"
   desc " * **`changelog_type`**: Type of changelog to generate, if any. Possible values are jenkins, pr, git, or none. (Default: `none`)"
   desc " * **`release_notes`**: Release notes for the release, if not using a changelog_type. (Default: `nil`)"
+  desc "#### Environment Variables"
+  desc " * **`FIREBASE_APP_ID`**: Firebase app ID. Should be passed as a secure text value. Required."
+  desc " * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required."
   lane :beta do |options|
     options[:configuration] ||= "Release"
     options[:include_bitcode] ||= false
@@ -67,28 +71,19 @@ platform :ios do
     
     uploadToFirebase(
       changelog_type: options[:changelog_type],
-      release_notes: options[:release_notes]
+      release_notes: options[:release_notes],
+      groups: options[:groups]
     )
   end
-  
-  desc "Increments the build number, builds, uploads to Firebase, and commits the updated build number."
-  lane :betaBumpingBuildNumber do |options|
-    options[:group] ||= ENV["CRASHLYTICS_QA_GROUP"]
-    incrementBuildNumber
-    
-    raise "betaQA: A Firebase group must be provided through the CRASHLYTICS_QA_GROUP environment variable." unless ENV["CRASHLYTICS_QA_GROUP"]
-    
-    beta(group: options[:group])
-    
-    commit_version_bump(message: "Automatically bumping build number to #{lane_context[SharedValues::BUILD_NUMBER]}.")
-    push_to_git_remote
-  end
 
-  desc "Upload a local IPA to Firebase App Distribution with (app_id) and (groups)."
+  desc "Upload a local IPA and dSYM to Firebase App Distribution."
   desc "#### Options"
-  desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"`, \"none\" – default: `\"none\"`)"
-  desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog."
-  desc " * **`firebase_cli_token`**: The Firebase CLI token. (string - default: The `FIREBASE_TOKEN` environment variable.)"
+  desc " * **`groups`**: Firebase distribution groups to notify of release. Required. (Default: `nil`)"
+  desc " * **`changelog_type`**: The type of changelog to generate (e.g. `\"git\"`, `\"jenkins\"`, `\"pr\"`, \"none\") (Default: `\"none\"`)"
+  desc " * **`release_notes`**: A string to set as the release notes; overrides any generated changelog. (Default: `nil`)"
+  desc "#### Environment Variables"
+  desc " * **`FIREBASE_APP_ID`**: Firebase app ID. Should be passed as a secure text value. Required."
+  desc " * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required."
   lane :uploadToFirebase do |options|
     options[:changelog_type] ||= "none"
     options[:app_id] ||= ENV["FIREBASE_APP_ID"]
@@ -135,16 +130,17 @@ platform :ios do
   desc "Adds the IPA and dSYM files using the IPA_OUTPUT_PATH and DSYM_OUTPUT_PATH from earlier builds, like gym. Customize those outputs if you want custom file names."
   desc "#### Options"
   desc " * **`repository_name`**: Name of the repo for the release. (Default: `GITHUB_REPO` environment variable.)"
-  desc " * **`api_token`**: A string to set as the release notes; overrides any generated changelog."
   desc " * **`name`**: Name for the release. (Default: `v<version_number>`)"
   desc " * **`description`**: Description for the release. (Default: `v<version_number>, build: <build_number>`)"
   desc " * **`tag_name`**: Tag name for the release. (Default: `v<version_number>`)"
+  desc "#### Environment Variables"
+  desc " * **`GITHUB_API_TOKEN`**: GitHub API token. Should be passed as a secure text value. Required."
   lane :createGitHubRelease do |options|
     options[:repository_name] ||= ENV["GITHUB_REPO"]
     options[:api_token] ||= ENV["GITHUB_API_TOKEN"]
 
     raise "A respository_name is required. Provide the GITHUB_REPO environment variable or a value directly." unless options[:repository_name]
-    raise "An api_token is required. Provide the GITHUB_API_TOKEN environment variable from secure storage or a value directly." unless options[:api_token]
+    raise "An api_token is required. Provide the GITHUB_API_TOKEN environment variable from secure storage." unless options[:api_token]
 
     unless lane_context[SharedValues::VERSION_NUMBER]
       get_version_number
