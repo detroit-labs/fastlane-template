@@ -105,6 +105,8 @@ Build and upload to Firebase with (configuration (Release)), (include_bitcode (f
 
 #### Options
 
+ * **`groups`**: Firebase distribution groups to notify of release. Required. (Default: `nil`)
+
  * **`configuration`**: Build configuration to use. (Default: `Release`)
 
  * **`include_bitcode`**: Whether or not to build with bitcode enabled. (Default: `false`)
@@ -116,24 +118,35 @@ Build and upload to Firebase with (configuration (Release)), (include_bitcode (f
  * **`changelog_type`**: Type of changelog to generate, if any. Possible values are jenkins, pr, git, or none. (Default: `none`)
 
  * **`release_notes`**: Release notes for the release, if not using a changelog_type. (Default: `nil`)
-### ios betaBumpingBuildNumber
-```
-fastlane ios betaBumpingBuildNumber
-```
-Increments the build number, builds, uploads to Firebase, and commits the updated build number.
+
+ * **`upload_symbols`**: Whether or not to upload symbols to Firebase. Requires FirebaseCrashlytics pod to be installed. (Default: `true`)
+
+#### Environment Variables
+
+ * **`FIREBASE_APP_ID`**: Firebase app ID. Should be passed as a secure text value. Required.
+
+ * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required.
 ### ios uploadToFirebase
 ```
 fastlane ios uploadToFirebase
 ```
-Upload a local IPA to Firebase App Distribution with (app_id) and (groups).
+Upload a local IPA and dSYM to Firebase App Distribution.
 
 #### Options
 
- * **`changelog_type`**: The type of changelog to generate (e.g. `"git"`, `"jenkins"`, `"pr"`, "none" – default: `"none"`)
+ * **`groups`**: Firebase distribution groups to notify of release. Required. (Default: `nil`)
 
- * **`release_notes`**: A string to set as the release notes; overrides any generated changelog.
+ * **`upload_symbols`**: Whether or not to upload symbols to Firebase. Requires FirebaseCrashlytics pod to be installed. (Default: `true`)
 
- * **`firebase_cli_token`**: The Firebase CLI token. (string - default: The `FIREBASE_TOKEN` environment variable.)
+ * **`changelog_type`**: The type of changelog to generate (e.g. `"git"`, `"jenkins"`, `"pr"`, "none") (Default: `"none"`)
+
+ * **`release_notes`**: A string to set as the release notes; overrides any generated changelog. (Default: `nil`)
+
+#### Environment Variables
+
+ * **`FIREBASE_APP_ID`**: Firebase app ID. Should be passed as a secure text value. Required.
+
+ * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required.
 ### ios createGitHubRelease
 ```
 fastlane ios createGitHubRelease
@@ -146,13 +159,15 @@ Adds the IPA and dSYM files using the IPA_OUTPUT_PATH and DSYM_OUTPUT_PATH from 
 
  * **`repository_name`**: Name of the repo for the release. (Default: `GITHUB_REPO` environment variable.)
 
- * **`api_token`**: A string to set as the release notes; overrides any generated changelog.
-
  * **`name`**: Name for the release. (Default: `v<version_number>`)
 
  * **`description`**: Description for the release. (Default: `v<version_number>, build: <build_number>`)
 
  * **`tag_name`**: Tag name for the release. (Default: `v<version_number>`)
+
+#### Environment Variables
+
+ * **`GITHUB_API_TOKEN`**: GitHub API token. Should be passed as a secure text value. Required.
 ### ios incrementBuildNumber
 ```
 fastlane ios incrementBuildNumber
@@ -163,9 +178,9 @@ Sets the build number to the given value or, if none is provided, automatically 
 fastlane ios setBuildNumberToCommitCount
 ```
 Sets the build number to the current commit count.
-### ios setBuildNumberToTimeStamp
+### ios setBuildNumberToTimestamp
 ```
-fastlane ios setBuildNumberToTimeStamp
+fastlane ios setBuildNumberToTimestamp
 ```
 Set the build number to a Unix timestamp.
 ### ios cleanupArchive
