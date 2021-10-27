@@ -118,9 +118,6 @@ platform :ios do
           raise "Unrecognized changelog_type: #{options[:changelog_type]}"
       end
     end
-    
-    UI.message("changelog_type: #{options[:changelog_type]}")
-    UI.message("release_notes: #{options[:release_notes]}")
 
     firebase_app_distribution(
       firebase_cli_token: options[:firebase_cli_token],
