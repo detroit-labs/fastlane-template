@@ -64,6 +64,9 @@ platform :ios do
     options[:export_options] ||= {}
     options[:upload_symbols] = true if options[:upload_symbols].nil?
 
+    UI.message("changelog_type: #{options[:changelog_type]}")
+    UI.message("release_notes: #{options[:release_notes]}")
+
     build(
       configuration: options[:configuration], 
       include_bitcode: options[:include_bitcode], 
@@ -99,11 +102,13 @@ platform :ios do
     raise "uploadToFirebase: A CLI token must be provided, either through the firebase_cli_token parameter or FIREBASE_TOKEN environment variable." unless options[:firebase_cli_token]
 
     unless options.key?(:release_notes)
+      UI.message("No release notes, generating.")
       case options[:changelog_type]
         when "jenkins"
           make_changelog_from_jenkins
 
         when "pr"
+          UI.message("In PR notes.")
           raise "uploadToFirebase: Environment variable for PR ID is not set (ghprbPullId)." unless ENV.key?("ghprbPullId")
           options[:release_notes] = "PR: ##{ENV["ghprbPullId"]}\nBranch: (#{ENV["GIT_BRANCH"]})\nPR Link: #{ENV["ghprbPullLink"]}"
 
@@ -118,6 +123,9 @@ platform :ios do
           raise "Unrecognized changelog_type: #{options[:changelog_type]}"
       end
     end
+    
+    UI.message("changelog_type: #{options[:changelog_type]}")
+    UI.message("release_notes: #{options[:release_notes]}")
 
     firebase_app_distribution(
       firebase_cli_token: options[:firebase_cli_token],
