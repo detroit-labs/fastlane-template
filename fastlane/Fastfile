@@ -101,7 +101,7 @@ platform :ios do
     raise "uploadToFirebase: A tester group must be passed as an option." unless options[:groups]
     raise "uploadToFirebase: A CLI token must be provided, either through the firebase_cli_token parameter or FIREBASE_TOKEN environment variable." unless options[:firebase_cli_token]
 
-    unless options.key?(:release_notes)
+    unless options[:release_notes]
       UI.message("No release notes, generating.")
       case options[:changelog_type]
         when "jenkins"
