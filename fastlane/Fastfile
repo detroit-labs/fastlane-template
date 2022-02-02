@@ -112,7 +112,6 @@ platform :ios do
           
         when "none"
           UI.message("uploadToFirebase called with a changelog_type of none.")
-          break
 
         else
           raise "Unrecognized changelog_type: #{options[:changelog_type]}"
