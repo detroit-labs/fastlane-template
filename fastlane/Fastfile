@@ -12,12 +12,17 @@ platform :ios do
       cocoapods(silent: true, try_repo_update_on_error: true)
     end
   end
-  
+
   after_all do |lanes, options|
     cleanup(options)
     removeKeychainsIfPossible
   end
-  
+
+  error do |lanes, options|
+    cleanup(options)
+    removeAllKeychainsIfPossible
+  end
+
   desc "Runs all the tests."
   lane :runTests do
     scan(
