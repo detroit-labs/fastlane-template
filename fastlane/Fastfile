@@ -15,27 +15,27 @@ platform :ios do
   end
 
   after_all do |lanes, options|
-    cleanup(options)
+    cleanup(options: options)
     removeKeychainsIfPossible
-    custom_after_all(lanes, options)
+    custom_after_all(lanes: lanes, options: options)
   end
 
   error do |lanes, options|
-    cleanup(options)
+    cleanup(options: options)
     removeAllKeychainsIfPossible
-    custom_error(lanes, options)
+    custom_error(lanes: lanes, options: options)
   end
-  
+
   desc "Overridable lane called at the end of before_all."
   lane :custom_before_all do
     # Left empty for override.
   end
-  
+
   desc "Overridable lane called at the end of after_all."
   lane :custom_after_all do |lanes, options|
     # Left empty for override.
   end
-  
+
   desc "Overridable lane called at the end of error."
   lane :custom_error do |lanes, options|
     # Left empty for override.
@@ -250,7 +250,7 @@ platform :ios do
   desc "Cleanup simulator and build archives."
   lane :cleanup do |options|
     cleanupSimulator
-    cleanupArchive(options)
+    cleanupArchive(options: options)
   end
 end
 
