@@ -7,7 +7,7 @@ platform :ios do
   before_all do
     installKeychainsIfPossible
     installProfiles
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 13.0')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 13.2')
     if !ENV["SKIP_COCOAPODS"]
       cocoapods(silent: true, try_repo_update_on_error: true)
     end
@@ -22,7 +22,7 @@ platform :ios do
 
   error do |lanes, options|
     cleanup(options: options)
-    removeAllKeychainsIfPossible
+    removeKeychainsIfPossible
     custom_error(lanes: lanes, options: options)
   end
 
@@ -45,7 +45,7 @@ platform :ios do
   lane :runTests do
     scan(
       output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone 13 Pro (15.0)'
+      device: ENV["DEVICE"] || 'iPhone 13 Pro (15.2)'
     )
   end
 
