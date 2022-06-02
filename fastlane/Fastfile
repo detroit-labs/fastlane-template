@@ -455,7 +455,7 @@ lane :format do
 end
 
 desc "Run Blackboard from CocoaPods."
-lane :blackboard do
+lane :runBlackboard do
   if File.exist?("../.blackboard.yml")
     if File.exist?("../Pods/Blackboard/blackboard")
       sh "../Pods/Blackboard/blackboard"
