@@ -115,7 +115,25 @@ Removes a keychain by name by removing {name}Copy.
 [bundle exec] fastlane format
 ```
 
-Run SwiftFormat from CocoaPods
+Run SwiftFormat from CocoaPods.
+
+### blackboard
+
+```sh
+[bundle exec] fastlane blackboard
+```
+
+Run Blackboard from CocoaPods.
+
+### populateCrashlyticsSymbolUploadPath
+
+```sh
+[bundle exec] fastlane populateCrashlyticsSymbolUploadPath
+```
+
+Generate Crashlytics symbol upload path from module name for SPM usage.
+
+Should only be called when using Firebase Crashlytics through SPM.
 
 ----
 
