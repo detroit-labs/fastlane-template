@@ -478,7 +478,7 @@ lane :populateCrashlyticsSymbolUploadPath do |options|
     .available_options[0]
     .default_value
     .gsub('~', Dir.home)
-  glob_path = "#{derived_data_path}/#{product_module_name}-*/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols"
+  glob_path = "#{derived_data_path}/#{module_name}-*/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols"
 
   ENV["FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_BINARY_PATH"] = Dir.glob(glob_path)[0]
 end
