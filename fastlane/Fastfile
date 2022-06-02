@@ -441,15 +441,44 @@ lane :removeKeychain do |options|
   delete_keychain(name: copy_name)
 end
 
-desc "Run SwiftFormat from CocoaPods"
+desc "Run SwiftFormat from CocoaPods."
 lane :format do
   if File.exist?("../.swiftformat")
     if File.exist?("../Pods/SwiftFormat/CommandLineTool/swiftformat")
       sh "../Pods/SwiftFormat/CommandLineTool/swiftformat ../"
     else
-      puts "SwiftFormat not found, please install the SwiftFormat/CLI pod."
+      UI.message("SwiftFormat not found, please install the SwiftFormat/CLI pod.")
     end
   else
-    puts ".swiftformat file not found, please create one."
+    UI.message(".swiftformat file not found, please create one.")
   end
+end
+
+desc "Run Blackboard from CocoaPods."
+lane :blackboard do
+  if File.exist?("../.blackboard.yml")
+    if File.exist?("../Pods/Blackboard/blackboard")
+      sh "../Pods/Blackboard/blackboard"
+    else
+      UI.message("Blackboard not found, please install the Blackboard pod.")
+    end
+  else
+    UI.message(".blackboard.yml file not found, please create one.")
+  end
+end
+
+desc "Generate Crashlytics symbol upload path from module name for SPM usage."
+desc "Should only be called when using Firebase Crashlytics through SPM."
+lane :populateCrashlyticsSymbolUploadPath do |options|
+  module_name = options[:module_name]
+
+  raise "populateCrashlyticsSymbolUploadPath requires a module_name." unless module_name
+
+  derived_data_path = Fastlane::Actions::ClearDerivedDataAction
+    .available_options[0]
+    .default_value
+    .gsub('~', Dir.home)
+  glob_path = "#{derived_data_path}/#{product_module_name}-*/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols"
+
+  ENV["FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_BINARY_PATH"] = Dir.glob(glob_path)[0]
 end
