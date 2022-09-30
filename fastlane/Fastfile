@@ -281,7 +281,7 @@ lane :updateDependencies do |options|
     bundle_update if File.exist?("../Gemfile.lock")
     cocoapods_update if File.exist?("../Podfile.lock")
     carthage(command: "update", no_build: true) if File.exist?("../Cartfile.resolved")
-    updateXcodeSwiftPackages(xcodeResolvedFilePath: xcodeResolvedFilePath)
+    updateXcodeSwiftPackages(xcodeResolvedFilePath: options[:xcodeResolvedFilePath])
 
     sendUpdatePullRequest(
       branchname: options[:branchname],
