@@ -292,15 +292,15 @@ end
 
 desc "Updates Xcode Swift packages by deleting the .resolved file and reresolving. Should work barring Xcode not properly finding the latest version."
 lane :updateXcodeSwiftPackages do |options|
-  options[:xcodeResolvedFilePath] ||= ENV["XCODE_RESOLVED_FILE_PATH"]
+  xcodeResolvedFilePath = options[:xcodeResolvedFilePath] ||= ENV["XCODE_RESOLVED_FILE_PATH"]
 
   if File.exist?(xcodeResolvedFilePath)
     UI.message("Removing Xcode Package.resolved at #{ xcodeResolvedFilePath }")
     File.delete(xcodeResolvedFilePath)
     UI.message("Updating Xcode packages.")
-    sh "xcodebuild -resolvePackageDependencies"
+    sh "cd ..;xcodebuild -resolvePackageDependencies"
   else
-    UI.message("No Xcode Package.resolved path, ignoring...")
+    UI.message("No Xcode Package.resolved file, ignoring...}")
   end
 end
 
