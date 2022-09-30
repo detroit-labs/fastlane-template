@@ -294,7 +294,7 @@ desc "Updates Xcode Swift packages by deleting the .resolved file and reresolvin
 lane :updateXcodeSwiftPackages do |options|
   xcodeResolvedFilePath = options[:xcodeResolvedFilePath] ||= ENV["XCODE_RESOLVED_FILE_PATH"]
 
-  if File.exist?(xcodeResolvedFilePath)
+  if xcodeResolvedFilePath && File.exist?(xcodeResolvedFilePath)
     UI.message("Removing Xcode Package.resolved at #{ xcodeResolvedFilePath }")
     File.delete(xcodeResolvedFilePath)
     UI.message("Updating Xcode packages.")
