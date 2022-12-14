@@ -116,6 +116,7 @@ platform :ios do
     options[:upload_symbols] = true if options[:upload_symbols].nil?
     options[:app_id] ||= ENV["FIREBASE_APP_ID"]
     options[:firebase_cli_token] ||= ENV["FIREBASE_TOKEN"]
+    options[:debug] ||= ENV["FIREBASE_DEBUG"]
 
     raise "uploadToFirebase: An app ID must be passed as an option (e.g. `\"1:123456789:ios:abcd1234\"`)." unless options[:app_id]
     raise "uploadToFirebase: A tester group must be passed as an option." unless options[:groups]
@@ -145,7 +146,8 @@ platform :ios do
       firebase_cli_token: options[:firebase_cli_token],
       app: options[:app_id],
       release_notes: options[:release_notes],
-      groups: options[:groups]
+      groups: options[:groups],
+      debug: true
     )
 
     if options[:upload_symbols]
