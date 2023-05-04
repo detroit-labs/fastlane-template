@@ -8,7 +8,7 @@ platform :ios do
     installKeychainsIfPossible
     installProfiles
     xcodes(
-      version: '~> 14.3',
+      version: ENV["XCODE_VERSION"] || '14.3',
       select_for_current_build_only: true,
       binary_path: '/opt/homebrew/bin/xcodes'
     )
@@ -283,7 +283,7 @@ lane :updateDependencies do |options|
     fastlane_require 'fastlane-plugin-git_status'
 
     xcodes(
-      version: ENV["XCODE_VERSION"] || '~> 14.3',
+      version: ENV["XCODE_VERSION"] || '14.3',
       select_for_current_build_only: true,
     )
     # xcversion(version: ENV["XCODE_VERSION"] || '~> 14.3')
