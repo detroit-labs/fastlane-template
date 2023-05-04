@@ -10,7 +10,7 @@ platform :ios do
     xcodes(
       version: ENV["XCODE_VERSION"] || '14.3',
       select_for_current_build_only: true,
-      binary_path: '/opt/homebrew/bin/xcodes'
+      # binary_path: '/opt/homebrew/bin/xcodes'
     )
     # xcversion(version: ENV["XCODE_VERSION"] || '~> 14.3')
     if !ENV["SKIP_COCOAPODS"]
