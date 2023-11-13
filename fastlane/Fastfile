@@ -42,7 +42,7 @@ platform :ios do
   end
 
   desc "Runs all the tests."
-  lane :runTests do
+  lane :runTests do |options|
     options[:xcargs] ||= ENV["SCAN_XCARGS"] || = "-skipMacroValidation"
 
     scan(
