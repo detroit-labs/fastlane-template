@@ -43,7 +43,7 @@ platform :ios do
 
   desc "Runs all the tests."
   lane :runTests do |options|
-    options[:xcargs] ||= ENV["SCAN_XCARGS"] || = "-skipMacroValidation"
+    options[:xcargs] ||= ENV["SCAN_XCARGS"] ||= "-skipMacroValidation"
 
     scan(
       output_types: "junit",
@@ -59,7 +59,7 @@ platform :ios do
     options[:export_method] ||= ENV["GYM_EXPORT_METHOD"] ||= "enterprise"
     options[:export_options] ||= {}
     options[:output_name] ||= nil
-    options[:xcargs] ||= ENV["GYM_XCARGS"] || = "-skipMacroValidation"
+    options[:xcargs] ||= ENV["GYM_XCARGS"] ||= "-skipMacroValidation"
 
     gym(
       configuration: options[:configuration],
