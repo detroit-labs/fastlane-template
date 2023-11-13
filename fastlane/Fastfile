@@ -43,10 +43,12 @@ platform :ios do
 
   desc "Runs all the tests."
   lane :runTests do
+    options[:xcargs] ||= ENV["SCAN_XCARGS"] || = "-skipMacroValidation"
+
     scan(
       output_types: "junit",
       device: ENV["DEVICE"] || 'iPhone 14 Pro',
-      xcargs: "-skipMacroValidation"
+      xcargs: options[:xcargs]
     )
   end
 
@@ -57,6 +59,7 @@ platform :ios do
     options[:export_method] ||= ENV["GYM_EXPORT_METHOD"] ||= "enterprise"
     options[:export_options] ||= {}
     options[:output_name] ||= nil
+    options[:xcargs] ||= ENV["GYM_XCARGS"] || = "-skipMacroValidation"
 
     gym(
       configuration: options[:configuration],
@@ -64,7 +67,7 @@ platform :ios do
       export_method: options[:export_method],
       export_options: options[:export_options],
       output_name: options[:output_name],
-      xcargs: "-skipMacroValidation"
+      xcargs: options[:xcargs]
     )
   end
 
