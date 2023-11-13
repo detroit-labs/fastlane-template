@@ -45,7 +45,8 @@ platform :ios do
   lane :runTests do
     scan(
       output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone 13 Pro'
+      device: ENV["DEVICE"] || 'iPhone 14 Pro',
+      xcargs: "-skipMacroValidation"
     )
   end
 
@@ -62,7 +63,8 @@ platform :ios do
       include_bitcode: options[:include_bitcode],
       export_method: options[:export_method],
       export_options: options[:export_options],
-      output_name: options[:output_name]
+      output_name: options[:output_name],
+      xcargs: "-skipMacroValidation"
     )
   end
 
