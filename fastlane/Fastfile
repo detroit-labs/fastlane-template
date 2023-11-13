@@ -7,7 +7,7 @@ platform :ios do
   before_all do
     installKeychainsIfPossible
     installProfiles
-    xcversion(version: ENV["XCODE_VERSION"] || '~> 13.2')
+    xcversion(version: ENV["XCODE_VERSION"] || '~> 14.3')
     if !ENV["SKIP_COCOAPODS"]
       cocoapods(silent: true, try_repo_update_on_error: true)
     end
@@ -45,7 +45,8 @@ platform :ios do
   lane :runTests do
     scan(
       output_types: "junit",
-      device: ENV["DEVICE"] || 'iPhone 13 Pro'
+      device: ENV["DEVICE"] || 'iPhone 14 Pro',
+      xcargs: "-skipMacroValidation"
     )
   end
 
@@ -62,7 +63,8 @@ platform :ios do
       include_bitcode: options[:include_bitcode],
       export_method: options[:export_method],
       export_options: options[:export_options],
-      output_name: options[:output_name]
+      output_name: options[:output_name],
+      xcargs: "-skipMacroValidation"
     )
   end
 
