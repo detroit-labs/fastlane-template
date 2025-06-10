@@ -291,8 +291,7 @@ lane :updateDependencies do |options|
     )
     bundle_update if File.exist?("../Gemfile.lock")
     cocoapods_update if File.exist?("../Podfile.lock")
-    carthage(command: "update", no_build: true) if File.exist?("../Cartfile.resolved")
-    # updateXcodeSwiftPackages(xcodeResolvedFilePath: options[:xcodeResolvedFilePath])
+    updateXcodeSwiftPackages(xcodeResolvedFilePath: options[:xcodeResolvedFilePath])
 
     sendUpdatePullRequest(
       branchname: options[:branchname],
@@ -309,7 +308,9 @@ lane :updateXcodeSwiftPackages do |options|
     UI.message("Removing Xcode Package.resolved at #{ xcodeResolvedFilePath }")
     File.delete(xcodeResolvedFilePath)
     UI.message("Updating Xcode packages.")
-    sh "cd ..;xcodebuild -resolvePackageDependencies"
+    packagePath = "#{ File.expand_path("..", Dir.pwd) }/package_cache"
+    sh "cd ..; xcodebuild -resolvePackageDependencies -clonedSourcePackagesDirPath #{ packagePath }"
+    FileUtils.remove_dir(packagePath)
   else
     UI.message("No Xcode Package.resolved file, ignoring...}")
   end
