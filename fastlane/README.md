@@ -13,13 +13,13 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
-### installProfiles
+### blackboard
 
 ```sh
-[bundle exec] fastlane installProfiles
+[bundle exec] fastlane blackboard
 ```
 
-Installs any provisioning profiles in $PROFILE_DIRECTORY, relative to Fastlane's execution path.
+Run Blackboard using Mint from the root of the project.
 
 ### updateDependencies
 
@@ -27,87 +27,45 @@ Installs any provisioning profiles in $PROFILE_DIRECTORY, relative to Fastlane's
 [bundle exec] fastlane updateDependencies
 ```
 
-Updates project dependencies in Bundler and CocoaPods, then sends a pull request if there are changes
+Updates project dependencies in Bundler, then sends a pull request if there are changes.
 
-#### Options
+#### Environment Variables
 
- * **`branchname`**: Accepts an optional value to set the dependency updater branch. If no value is passed in, it will use the UPDATE_DEPENDENCIES_BRANCH environment variable, or default to jenkins-update-dependencies if it doesn't exit.
+ * **`GITHUB_REPO`**: GitHub repository name. Should be passed as a secure text value. Required.
 
- * **`base`**: Accepts an optional value to set the base branch for the created dependency update PR. If no value is passed in, it will default to main.
+ * **`PROJECT_GITHUB_API_TOKEN`**: GitHub API token. Should be passed as a secure text value. Required.
 
- * **`pullRequestTitle`**: Accepts an optional value to set the title for the created dependency update PR. If no value is passed in, it will default to Update Dependencies.
+ * **`XCODE_PROJECT_NAME`**: The project's xcodeproj name. Required.
 
-### sendUpdatePullRequest
+ * **`XCODE_VERSION`**: The Xcode application version. Required.
 
-```sh
-[bundle exec] fastlane sendUpdatePullRequest
-```
-
-Sends a pull request with the current changes to dependencies
-
-### installKeychainsIfPossible
+### installProfiles
 
 ```sh
-[bundle exec] fastlane installKeychainsIfPossible
+[bundle exec] fastlane installProfiles
 ```
 
-Installs the DL and project keychains if provided. This is a transitional API that should be removed once all projects move to keychain injections.
+Installs any provisioning profiles from a path relative to the root of the project.
 
-### removeKeychainsIfPossible
+#### Environment Variables
+
+ * **`PROVISIONING_PROFILE_PATH`**: A provisioning profile path. Required.
+
+### createGitHubRelease
 
 ```sh
-[bundle exec] fastlane removeKeychainsIfPossible
+[bundle exec] fastlane createGitHubRelease
 ```
 
-Removes the DL and project keychains if provided. This is a transitional API that should be removed once all projects move to keychain injections.
+Create and tag a GitHub release and attach any built IPA and dSYM to the release. This will be performed on the current branch.
 
-### installDLKeychain
+#### Environment Variables
 
-```sh
-[bundle exec] fastlane installDLKeychain
-```
+ * **`GITHUB_REPO`**: GitHub repository name. Should be passed as a secure text value. Required.
 
-Installs the DL keychain. Must provide path (or DL_KEYCHAIN_PATH) and password (or DL_KEYCHAIN_PASSWORD) parameters.
+ * **`PROJECT_GITHUB_API_TOKEN`**: GitHub API token. Should be passed as a secure text value. Required.
 
-### installProjectKeychain
-
-```sh
-[bundle exec] fastlane installProjectKeychain
-```
-
-Installs the project keychain from a path relative to the root of the project. Must provide path (or PROJECT_KEYCHAIN_PATH), and password (or PROJECT_KEYCHAIN_PASSWORD) parameters.
-
-### installKeychain
-
-```sh
-[bundle exec] fastlane installKeychain
-```
-
-Installs a keychain by first copying it. Requires the keychain file path and password parameters.
-
-### removeDLKeychain
-
-```sh
-[bundle exec] fastlane removeDLKeychain
-```
-
-Remove the Detroit Labs keychain. Requires the DL keychain path, or for DL_KEYCHAIN_PATH to be set.
-
-### removeProjectKeychain
-
-```sh
-[bundle exec] fastlane removeProjectKeychain
-```
-
-Remove the project keychain. Requires the project keychain path, or for PROJECT_KEYCHAIN_PATH to be set.
-
-### removeKeychain
-
-```sh
-[bundle exec] fastlane removeKeychain
-```
-
-Removes a keychain by name by removing {name}Copy.
+ * **`GYM_SCHEME`**: The project's scheme. Required.
 
 ### format
 
@@ -115,54 +73,58 @@ Removes a keychain by name by removing {name}Copy.
 [bundle exec] fastlane format
 ```
 
-Run SwiftFormat from CocoaPods.
+Run SwiftFormat using Mint from the root of the project.
 
-### blackboard
+#### Options
+
+ * **`strategy`**: A format strategy. Optional. Defaults to 'all'.
+
+   - **all**: All Swift source files will be formatted.
+
+   - **staged**: Only Git staged Swift source files will be formatted.
+
+### lint
 
 ```sh
-[bundle exec] fastlane blackboard
+[bundle exec] fastlane lint
 ```
 
-Run Blackboard from CocoaPods.
-
-### populateCrashlyticsSymbolUploadPath
-
-```sh
-[bundle exec] fastlane populateCrashlyticsSymbolUploadPath
-```
-
-Generate Crashlytics symbol upload path from module name for SPM usage.
-
-Should only be called when using Firebase Crashlytics through SPM.
+Run SwiftLint using Mint from the root of the project.
 
 ----
 
 
 ## iOS
 
-### ios custom_before_all
+### ios build
 
 ```sh
-[bundle exec] fastlane ios custom_before_all
+[bundle exec] fastlane ios build
 ```
 
-Overridable lane called at the end of before_all.
+Builds and packages iOS app.
 
-### ios custom_after_all
+#### Environment Variables
 
-```sh
-[bundle exec] fastlane ios custom_after_all
-```
+ * **`BUILD_NUMBER_STRATEGY`**: A build number strategy. Required.
 
-Overridable lane called at the end of after_all.
+   - **commits**: Sets the build number to the current commit count.
 
-### ios custom_error
+   - **timestamp**: Set the build number to a Unix timestamp.
 
-```sh
-[bundle exec] fastlane ios custom_error
-```
+   - **manual**: Does not change build number.
 
-Overridable lane called at the end of error.
+ * **`BUNDLE_IDENTIFIER`**: A bundle identifier. Required.
+
+ * **`GYM_CONFIGURATION`**: The gym configuration. Required.
+
+ * **`GYM_EXPORT_METHOD`**: The gym export method. Required.
+
+ * **`GYM_SCHEME`**: The project's scheme. Required.
+
+ * **`GYM_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-skipMacroValidation'.
+
+ * **`PROVISIONING_PROFILE`**: The provisioning profile. Required.
 
 ### ios runTests
 
@@ -172,45 +134,13 @@ Overridable lane called at the end of error.
 
 Runs all the tests.
 
-### ios build
-
-```sh
-[bundle exec] fastlane ios build
-```
-
-Build the archive and ipa with options (configuration (Release), include_bitcode (false), export_method (enterprise)), export_options ({}).
-
-### ios beta
-
-```sh
-[bundle exec] fastlane ios beta
-```
-
-Build and upload to Firebase with (configuration (Release)), (include_bitcode (false)), (export_method (enterprise)), (export_options ({})) and (group).
-
-#### Options
-
- * **`groups`**: Firebase distribution groups to notify of release. Required. (Default: `nil`)
-
- * **`configuration`**: Build configuration to use. (Default: `ENV["GYM_CONFIGURATION"]` or `Release`)
-
- * **`include_bitcode`**: Whether or not to build with bitcode enabled. (Default: `false`)
-
- * **`export_method`**: Export method to use. See `fastlane action gym` for options. (Default: `ENV["GYM_EXPORT_METHOD"]` or `enterprise`)
-
- * **`export_options`**: Custom export options to use (Default: `{}`)
-
- * **`changelog_type`**: Type of changelog to generate, if any. Possible values are jenkins, pr, git, or none. (Default: `none`)
-
- * **`release_notes`**: Release notes for the release, if not using a changelog_type. (Default: `nil`)
-
- * **`upload_symbols`**: Whether or not to upload symbols to Firebase. Requires FirebaseCrashlytics pod to be installed. (Default: `true`)
-
 #### Environment Variables
 
- * **`FIREBASE_APP_ID`**: Firebase app ID. Should be passed as a secure text value. Required.
+ * **`SCAN_DEVICE`**: The name of the simulator type you want to run tests on. Required.
 
- * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required.
+ * **`SCAN_SCHEME`**: The project's scheme. Required.
+
+ * **`SCAN_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-skipMacroValidation'.
 
 ### ios uploadToFirebase
 
@@ -222,91 +152,33 @@ Upload a local IPA and dSYM to Firebase App Distribution.
 
 #### Options
 
- * **`groups`**: Firebase distribution groups to notify of release. Required. (Default: `nil`)
-
- * **`upload_symbols`**: Whether or not to upload symbols to Firebase. Requires FirebaseCrashlytics pod to be installed. (Default: `true`)
-
- * **`changelog_type`**: The type of changelog to generate (e.g. `"git"`, `"jenkins"`, `"pr"`, "none") (Default: `"none"`)
-
- * **`release_notes`**: A string to set as the release notes; overrides any generated changelog. (Default: `nil`)
+ * **`release_notes`**: The release notes of this build. Optional.
 
 #### Environment Variables
 
- * **`FIREBASE_APP_ID`**: Firebase app ID. Should be passed as a secure text value. Required.
+ * **`FIREBASE_APP_ID`**: The Firebase application identifier. Required.
 
- * **`FIREBASE_TOKEN`**: Firebase distribution token. Should be passed as a secure text value. Required.
+ * **`FIREBASE_GROUPS`**: The Firebase distribution group names as a comma-separated list. Required.
 
-### ios createGitHubRelease
+ * **`FIREBASE_TOKEN`**: The Firebase command line interface token. Required.
+
+### ios uploadToTestFlight
 
 ```sh
-[bundle exec] fastlane ios createGitHubRelease
+[bundle exec] fastlane ios uploadToTestFlight
 ```
 
-Create and tag a GitHub release and attach any built IPA and dSYM to the release. This will be performed on the current branch.
-
-Adds the IPA and dSYM files using the IPA_OUTPUT_PATH and DSYM_OUTPUT_PATH from earlier builds, like gym. Customize those outputs if you want custom file names.
-
-#### Options
-
- * **`repository_name`**: Name of the repo for the release. (Default: `GITHUB_REPO` environment variable.)
-
- * **`name`**: Name for the release. (Default: `v<version_number>`)
-
- * **`description`**: Description for the release. (Default: `v<version_number>, build: <build_number>`)
-
- * **`tag_name`**: Tag name for the release. (Default: `v<version_number>`)
+Upload a local IPA to the TestFlight, the dSYM to Firebase Crashlytics, and create a GitHub release.
 
 #### Environment Variables
 
- * **`GITHUB_API_TOKEN`**: GitHub API token. Should be passed as a secure text value. Required.
+ * **`APPSTORE_API_KEY_ID`**: The AppStore API key identifier. Required.
 
-### ios incrementBuildNumber
+ * **`APPSTORE_API_ISSUER_ID`**: The AppStore API issuer identifier. Required.
 
-```sh
-[bundle exec] fastlane ios incrementBuildNumber
-```
+ * **`APPSTORE_API_PRIVATE_KEY`**: The AppStore contents of the key p8 file. Required.
 
-Sets the build number to the given value or, if none is provided, automatically sets the build number according to the strategy provided.
-
-### ios setBuildNumberToCommitCount
-
-```sh
-[bundle exec] fastlane ios setBuildNumberToCommitCount
-```
-
-Sets the build number to the current commit count.
-
-### ios setBuildNumberToTimestamp
-
-```sh
-[bundle exec] fastlane ios setBuildNumberToTimestamp
-```
-
-Set the build number to a Unix timestamp.
-
-### ios cleanupArchive
-
-```sh
-[bundle exec] fastlane ios cleanupArchive
-```
-
-Deletes the archive generated by gym.
-
-### ios cleanupSimulator
-
-```sh
-[bundle exec] fastlane ios cleanupSimulator
-```
-
-Shuts down and kills the simulator and background process.
-
-### ios cleanup
-
-```sh
-[bundle exec] fastlane ios cleanup
-```
-
-Cleanup simulator and build archives.
+ * **`FIREBASE_APP_ID`**: The Firebase application identifier. Required.
 
 ----
 

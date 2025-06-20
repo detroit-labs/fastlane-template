@@ -1,0 +1,90 @@
+desc "Updates project dependencies in Bundler, then sends a pull request if there are changes."
+desc "#### Environment Variables"
+desc " * **`GITHUB_REPO`**: GitHub repository name. Should be passed as a secure text value. Required."
+desc " * **`PROJECT_GITHUB_API_TOKEN`**: GitHub API token. Should be passed as a secure text value. Required."
+desc " * **`XCODE_PROJECT_NAME`**: The project's xcodeproj name. Required."
+desc " * **`XCODE_VERSION`**: The Xcode application version. Required."
+lane :updateDependencies do |options|
+  repository_name = ENV["GITHUB_REPO"]
+  api_token = ENV["PROJECT_GITHUB_API_TOKEN"]
+  projectName = ENV["XCODE_PROJECT_NAME"]
+  version = ENV["XCODE_VERSION"]
+
+  raise "updateDependencies: A GitHub repository name environment variable is required. (GITHUB_REPO)" unless repository_name
+  raise "updateDependencies: A GitHub API token environment variable is required. (PROJECT_GITHUB_API_TOKEN)" unless api_token
+  raise "updateDependencies: The project's xcodeproj name is required. (XCODE_PROJECT_NAME)" unless projectName
+  raise "updateDependencies: The Xcode application version environment variable is required. (XCODE_VERSION)" unless version
+
+  branch_name = "update-dependencies"
+  main_branch = "main"
+
+  bundle_update
+
+  xcodes(
+    version: version,
+    select_for_current_build_only: true
+  )
+
+  updateXcodeSwiftPackages
+
+  generate_acknowledgments(
+    project_name: projectName
+  )
+
+  if !git_status.empty?
+    create_git_branch(
+      branch_name: branch_name
+    )
+    checkout_git_branch(
+      branch_name: branch_name
+    )
+    git_add(
+      path: "."
+    )
+    git_commit(
+      path: ".",
+      message: "Updated Dependencies"
+    )
+    push_to_git_remote(
+      remote: "origin",
+      local_branch: branch_name,
+      remote_branch: branch_name,
+      force: true,
+      tags: false
+    )
+    create_pull_request(
+      api_token: api_token,
+      repo: repository_name,
+      head: branch_name,
+      base: main_branch,
+      title: "Updated Dependencies",
+      body: "Updated dependencies."
+    )
+  end
+end
+
+desc "Updates Xcode Swift packages by deleting the .resolved file and reresolving. Should work barring Xcode not properly finding the latest version."
+desc "#### Environment Variables"
+desc " * **`XCODE_PROJECT_NAME`**: The project's xcodeproj name. Required."
+private_lane :updateXcodeSwiftPackages do
+  projectName = ENV["XCODE_PROJECT_NAME"]
+
+  raise "updateXcodeSwiftPackages: The project's xcodeproj name is required. (XCODE_PROJECT_NAME)" unless projectName
+
+  xcodeResolvedFilePath = "#{projectName}.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+
+  UI.message("Looking for Xcode Package.resolved at: #{xcodeResolvedFilePath}")
+
+  Dir.chdir("..") do
+    if xcodeResolvedFilePath && File.exist?(xcodeResolvedFilePath)
+      UI.message("Removing Xcode Package.resolved file")
+      File.delete(xcodeResolvedFilePath)
+      UI.message("Updating Xcode packages...")
+      packagePath = "#{File.expand_path(".", Dir.pwd)}/package_cache"
+      sh "xcodebuild -resolvePackageDependencies -clonedSourcePackagesDirPath #{packagePath}"
+      FileUtils.remove_dir(packagePath)
+    else
+      UI.message("No Xcode Package.resolved file, ignoring...")
+    end
+  end
+end

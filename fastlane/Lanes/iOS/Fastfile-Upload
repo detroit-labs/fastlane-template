@@ -1,0 +1,66 @@
+platform :ios do
+
+  desc "Upload a local IPA and dSYM to Firebase App Distribution."
+  desc "#### Options"
+  desc " * **`release_notes`**: The release notes of this build. Optional."
+  desc "#### Environment Variables"
+  desc " * **`FIREBASE_APP_ID`**: The Firebase application identifier. Required."
+  desc " * **`FIREBASE_GROUPS`**: The Firebase distribution group names as a comma-separated list. Required."
+  desc " * **`FIREBASE_TOKEN`**: The Firebase command line interface token. Required."
+  lane :uploadToFirebase do |options|
+    release_notes = options[:release_notes] || "Branch: #{ENV["GITHUB_HEAD_REF"]}\n"
+
+    app_id = ENV["FIREBASE_APP_ID"]
+    groups = ENV["FIREBASE_GROUPS"]
+    firebase_cli_token = ENV["FIREBASE_TOKEN"]
+    
+    raise "uploadToFirebase: A Firebase application identifier environment variable is required. (FIREBASE_APP_ID)" unless app_id
+    raise "uploadToFirebase: A Firebase distribution group name environment variable is required. (FIREBASE_GROUPS)" unless groups
+    raise "uploadToFirebase: A Firebase command line interface token environment variable is required. (FIREBASE_TOKEN)" unless firebase_cli_token
+    
+    firebase_app_distribution(
+      firebase_cli_token: firebase_cli_token,
+      app: app_id,
+      release_notes: release_notes,
+      groups: groups
+    )
+
+    upload_symbols_to_crashlytics(
+      app_id: app_id
+    )
+  end
+
+  desc "Upload a local IPA to the TestFlight, the dSYM to Firebase Crashlytics, and create a GitHub release."
+  desc "#### Environment Variables"
+  desc " * **`APPSTORE_API_KEY_ID`**: The AppStore API key identifier. Required."
+  desc " * **`APPSTORE_API_ISSUER_ID`**: The AppStore API issuer identifier. Required."
+  desc " * **`APPSTORE_API_PRIVATE_KEY`**: The AppStore contents of the key p8 file. Required."
+  desc " * **`FIREBASE_APP_ID`**: The Firebase application identifier. Required."
+  lane :uploadToTestFlight do |options|
+    api_key_id = ENV["APPSTORE_API_KEY_ID"]
+    api_issuer_id = ENV["APPSTORE_API_ISSUER_ID"]
+    api_key_content = ENV["APPSTORE_API_PRIVATE_KEY"]
+    app_id = ENV["FIREBASE_APP_ID"]
+
+    raise "uploadToAppStore: An AppStore API key identifier environment variable is required. (APPSTORE_API_KEY_ID)" unless api_key_id
+    raise "uploadToAppStore: An AppStore API issuer identifierenvironment variable is required. (APPSTORE_API_ISSUER_ID)" unless api_issuer_id
+    raise "uploadToAppStore: An AppStore contents of the key p8 file environment variable is required. (APPSTORE_API_PRIVATE_KEY)" unless api_key_content
+    raise "uploadToFirebase: A Firebase application identifier environment variable is required. (FIREBASE_APP_ID)" unless app_id
+
+    api_key = app_store_connect_api_key(
+      key_id: api_key_id,
+      issuer_id: api_issuer_id,
+      key_content: api_key_content
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_submission: true
+    )
+
+    upload_symbols_to_crashlytics(
+      app_id: app_id
+    )
+  end
+
+end

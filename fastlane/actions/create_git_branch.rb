@@ -1,26 +1,22 @@
 module Fastlane
   module Actions
     class CreateGitBranchAction < Action
-      def self.run(params)
-        cmd = ['git branch']
-
-        cmd << "#{params[:branchname]}"
-        cmd << "#{params[:start_point]}" if params[:start_point]
-
-        sh(cmd.join(' '))
-      end
-
       def self.description
         "Creates a new Git branch with the given name"
       end
 
-      def self.author
-        ["SlaunchaMan"]
-      end
+      def self.run(params)
+        cmd = ['git branch']
 
+        cmd << "#{params[:branch_name]}"
+        cmd << "#{params[:start_point]}" if params[:start_point]
+
+        sh(cmd.join(' '))
+      end
+  
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :branchname,
+          FastlaneCore::ConfigItem.new(key: :branch_name,
                                        env_name: "FL_CREATE_GIT_BRANCH_NAME",
                                        description: "The name of the new branch",
                                        type: String,

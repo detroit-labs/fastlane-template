@@ -1,0 +1,27 @@
+desc "Run SwiftFormat using Mint from the root of the project."
+desc "#### Options"
+desc " * **`strategy`**: A format strategy. Optional. Defaults to 'all'."
+desc "   - **all**: All Swift source files will be formatted."
+desc "   - **staged**: Only Git staged Swift source files will be formatted."
+lane :format do |options|
+  strategy = options[:strategy] || "all"
+
+  raise "format: Requires strategy parameter." unless strategy
+
+  Dir.chdir("..") do
+    if File.exist?(".swiftformat")
+      case strategy
+        when "all"
+          UI.message("Formatting all Swift source files.")
+          sh "mint run swiftformat ./"
+        when "staged"
+          UI.message("Formatting only Git staged Swift source files.")
+          sh "git diff --diff-filter=d --staged --name-only | grep -e '\\(.*\\)\\.swift$' | tr \\\\n \\\\0 | xargs -0 mint run swiftformat"
+        else
+          raise "format: Unrecognized format strategy: '#{strategy}'"
+      end
+    else
+      UI.error("SwiftFormat configuration file not found, please create one. (.swiftformat)")
+    end
+  end
+end

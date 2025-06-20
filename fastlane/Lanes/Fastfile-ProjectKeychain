@@ -1,0 +1,30 @@
+desc "Installs the project keychain from a path relative to the root of the project."
+desc "#### Environment Variables"
+desc " * **`PROJECT_KEYCHAIN_PATH`**: A project keychain path. Required."
+desc " * **`PROJECT_KEYCHAIN_PASSWORD`**: A project keychain password. Required."
+private_lane :installProjectKeychain do
+  path = ENV["PROJECT_KEYCHAIN_PATH"]
+
+  if path
+    UI.message("Installing the project keychain...")
+
+    password = ENV["PROJECT_KEYCHAIN_PASSWORD"]
+    raise "installProjectKeychain: A project keychain password environment variable is required. (PROJECT_KEYCHAIN_PASSWORD)" unless password
+
+    installKeychain(path: path, password: password)
+  end
+end
+
+desc "Removes the installed project keychain."
+desc "#### Environment Variables"
+desc " * **`PROJECT_KEYCHAIN_PATH`**: A project keychain path. Required."
+private_lane :removeProjectKeychain do
+  path = ENV["PROJECT_KEYCHAIN_PATH"]
+
+  if path
+    UI.message("Removing the project keychain...")
+
+    name = File.basename(path, File.extname(path))
+    removeKeychain(name: name)
+  end
+end

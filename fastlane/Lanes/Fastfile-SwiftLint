@@ -1,0 +1,10 @@
+desc "Run SwiftLint using Mint from the root of the project."
+lane :lint do
+  Dir.chdir("..") do
+    if File.exist?(".swiftlint.yml")
+      sh "mint run swiftlint lint"
+    else
+      UI.error("SwiftLint configuration file not found, please create one. (.swiftlint.yml)")
+    end
+  end
+end

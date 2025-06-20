@@ -1,0 +1,24 @@
+platform :ios do
+
+  desc "Runs all the tests."
+  desc "#### Environment Variables"
+  desc " * **`SCAN_DEVICE`**: The name of the simulator type you want to run tests on. Required."
+  desc " * **`SCAN_SCHEME`**: The project's scheme. Required."
+  desc " * **`SCAN_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-skipMacroValidation'."
+  lane :runTests do
+    device = ENV["SCAN_DEVICE"]
+    scheme = ENV["SCAN_SCHEME"]
+    xcargs = ENV["SCAN_XCARGS"] || "-skipMacroValidation"
+    
+    raise "runTests: The project's scheme environment variable is required. (SCAN_DEVICE)" unless scheme
+    raise "runTests: A scan device environment variable is required. (SCAN_SCHEME)" unless device
+
+    scan(
+      output_types: "junit",
+      device: device,
+      scheme: scheme,
+      xcargs: xcargs
+    )
+  end
+
+end
