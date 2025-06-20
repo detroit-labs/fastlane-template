@@ -1,0 +1,75 @@
+platform :ios do
+
+  desc "Builds and packages iOS app."
+  desc "#### Environment Variables"
+  desc " * **`BUILD_NUMBER_STRATEGY`**: A build number strategy. Required."
+  desc "   - **commits**: Sets the build number to the current commit count."
+  desc "   - **timestamp**: Set the build number to a Unix timestamp."
+  desc "   - **manual**: Does not change build number."
+  desc " * **`BUNDLE_IDENTIFIER`**: A bundle identifier. Required."
+  desc " * **`GYM_CONFIGURATION`**: The gym configuration. Required."
+  desc " * **`GYM_EXPORT_METHOD`**: The gym export method. Required."
+  desc " * **`GYM_SCHEME`**: The project's scheme. Required."
+  desc " * **`GYM_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-skipMacroValidation'."
+  desc " * **`PROVISIONING_PROFILE`**: The provisioning profile. Required."
+  lane :build do
+    bundle_identifier = ENV["BUNDLE_IDENTIFIER"]
+    provisioning_profile = ENV["PROVISIONING_PROFILE"]
+
+    raise "build: A bundle identifier environment variable is required. (BUNDLE_IDENTIFIER)" unless bundle_identifier
+    raise "build: A provisioning profile environment variable is required. (PROVISIONING_PROFILE)" unless provisioning_profile
+
+    configuration = ENV["GYM_CONFIGURATION"]
+    scheme = ENV["GYM_SCHEME"]
+    export_method = ENV["GYM_EXPORT_METHOD"]
+    export_options = {
+      provisioningProfiles: {
+        bundle_identifier => provisioning_profile
+      }
+    }
+    xcargs = ENV["GYM_XCARGS"] || "-skipMacroValidation"
+
+    raise "build: A gym configuration environment variable is required. (GYM_CONFIGURATION)" unless configuration
+    raise "build: The project's scheme environment variable is required. (GYM_SCHEME)" unless scheme
+    raise "build: A gym export method environment variable is required. (GYM_EXPORT_METHOD)" unless export_method
+
+    incrementBuildNumber
+
+    gym(
+      configuration: configuration,
+      scheme: scheme,
+      include_bitcode: false,
+      export_method: export_method,
+      export_options: export_options,
+      xcargs: xcargs
+    )
+  end
+
+  desc "Updates the build number given the strategy provided."
+  desc "#### Environment Variables"
+  desc " * **`BUILD_NUMBER_STRATEGY`**: A build number strategy. Required."
+  desc "   - **commits**: Sets the build number to the current commit count."
+  desc "   - **timestamp**: Set the build number to a Unix timestamp."
+  desc "   - **manual**: Does not change build number."
+  private_lane :incrementBuildNumber do
+    strategy = ENV["BUILD_NUMBER_STRATEGY"]
+
+    raise "incrementBuildNumber: Requires strategy parameter." unless strategy
+
+    case strategy
+    when "commits"
+      build_number = number_of_commits
+      UI.message("Setting build number to: #{build_number}")
+      increment_build_number(build_number: build_number)
+    when "timestamp"
+      build_number = "#{Time.now.to_i}"
+      UI.message("Setting build number to: #{build_number}")
+      increment_build_number(build_number: build_number)
+    when "manual"
+      UI.message("Leaving build number alone, making no changes.")
+    else
+      raise "incrementBuildNumber: Unrecognized incrementBuildNumber strategy: '#{strategy}'"
+    end
+  end
+
+end

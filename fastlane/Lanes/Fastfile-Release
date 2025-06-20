@@ -1,0 +1,47 @@
+desc "Create and tag a GitHub release and attach any built IPA and dSYM to the release. This will be performed on the current branch."
+desc "#### Environment Variables"
+desc " * **`GITHUB_REPO`**: GitHub repository name. Should be passed as a secure text value. Required."
+desc " * **`PROJECT_GITHUB_API_TOKEN`**: GitHub API token. Should be passed as a secure text value. Required."
+desc " * **`GYM_SCHEME`**: The project's scheme. Required."
+lane :createGitHubRelease do |options|
+  repository_name = ENV["GITHUB_REPO"]
+  api_token = ENV["PROJECT_GITHUB_API_TOKEN"]
+  scheme = ENV["GYM_SCHEME"]
+
+  raise "createGitHubRelease: A GitHub repository name environment variable is required. (GITHUB_REPO)" unless repository_name
+  raise "createGitHubRelease: A GitHub API token environment variable is required. (PROJECT_GITHUB_API_TOKEN)" unless api_token
+  raise "createGitHubRelease: The project's scheme environment variable is required. (GYM_SCHEME)" unless scheme
+
+  ipa_filename = "#{scheme}.ipa"
+  dsym_filename = "#{scheme}.app.dSYM.zip"
+
+  raise "createGitHubRelease: An application IPA file is required. (#{ipa_filename})" unless File.exist?("../#{ipa_filename}")
+  raise "createGitHubRelease: A application DSYM file is required. (#{dsym_filename})" unless File.exist?("../#{dsym_filename}")
+
+  unless lane_context[SharedValues::VERSION_NUMBER]
+    get_version_number
+  end
+  version_number = lane_context[SharedValues::VERSION_NUMBER]
+
+  unless lane_context[SharedValues::BUILD_NUMBER]
+    get_build_number
+  end
+  build_number = lane_context[SharedValues::BUILD_NUMBER]
+
+  name = "v#{version_number}-#{build_number}"
+  description = "v#{version_number}, build: #{build_number}"
+  tag_name = name
+  branch = git_branch.sub('origin/', '')
+
+  upload_assets = [ipa_filename, dsym_filename]
+
+  set_github_release(
+    repository_name: repository_name,
+    api_token: api_token,
+    name: name,
+    description: description,
+    tag_name: tag_name,
+    commitish: branch,
+    upload_assets: upload_assets
+  )
+end

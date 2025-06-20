@@ -1,0 +1,30 @@
+desc "Installs the Detroit Labs keychain from a path relative to the root of the project."
+desc "#### Environment Variables"
+desc " * **`DL_KEYCHAIN_PATH`**: A Detroit Labs keychain path. Required."
+desc " * **`DL_KEYCHAIN_PASSWORD`**: A Detroit Labs keychain password. Required."
+private_lane :installDetroitLabsKeychain do
+  path = ENV["DL_KEYCHAIN_PATH"]
+
+  if path
+    UI.message("Installing the Detroit Labs keychain...")
+
+    password = ENV["DL_KEYCHAIN_PASSWORD"]
+    raise "installDetroitLabsKeychain: A Detroit Labs keychain password environment variable is required. (DL_KEYCHAIN_PASSWORD)" unless password
+
+    installKeychain(path: path, password: password)
+  end
+end
+
+desc "Removes the installed Detroit Labs keychain."
+desc "#### Environment Variables"
+desc " * **`DL_KEYCHAIN_PATH`**: A Detroit Labs keychain path. Required."
+private_lane :removeDetroitLabsKeychain do
+  path = ENV["DL_KEYCHAIN_PATH"]
+
+  if path
+    UI.message("Removing the Detroit Labs keychain...")
+
+    name = File.basename(path, File.extname(path))
+    removeKeychain(name: name)
+  end
+end

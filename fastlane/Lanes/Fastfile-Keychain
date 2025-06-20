@@ -1,0 +1,60 @@
+desc "Installs the Detroit Labs and project keychains if provided."
+desc "#### Environment Variables"
+desc " * **`DL_KEYCHAIN_BASE64`**: A Detroit Labs keychain base64 encoded. Required."
+desc " * **`DL_KEYCHAIN_PATH`**: A Detroit Labs keychain path. Required."
+private_lane :installKeychains do
+  if ENV["GITHUB_ACTIONS"]
+    UI.message("Detected GitHub Actions, writing base64 Detroit Labs keychain to disk.")
+
+    raise "installKeychains: A Detroit Labs keychain base64 environment variable is required. (DL_KEYCHAIN_BASE64)" unless ENV["DL_KEYCHAIN_BASE64"]
+    raise "installKeychains: A Detroit Labs keychain path environment variable is required. (DL_KEYCHAIN_PATH)" unless ENV["DL_KEYCHAIN_PATH"]
+
+    sh "echo $DL_KEYCHAIN_BASE64 | base64 --decode > $DL_KEYCHAIN_PATH"
+  end
+
+  installDetroitLabsKeychain
+  installProjectKeychain
+end
+
+desc "Removes the Detroit Labs and project keychains if provided."
+private_lane :removeKeychains do
+  removeDetroitLabsKeychain
+  removeProjectKeychain
+end
+
+desc "Installs a keychain by first copying it."
+desc "#### Options"
+desc " * **`path`**: The keychain path. Required."
+desc " * **`password`**: The keychain password. Required."
+private_lane :installKeychain do |options|
+  path = options[:path]
+  password = options[:password]
+
+  raise "installKeychain: Requires path parameter." unless path
+  raise "installKeychain: Requires password parameter." unless password
+
+  name = File.basename(path, File.extname(path))
+  keychain_name = "#{name}-FastlaneInstalled"
+  install_name = "#{keychain_name}.keychain"
+
+  Dir.chdir("..") do
+    UI.message("Copying keychain named '#{name}' to '#{keychain_name}'...")
+    FileUtils.cp(path, install_name)
+    UI.message("Unlocking keychain named '#{keychain_name}'...")
+    unlock_keychain(path: File.join(Dir.pwd, install_name), password: password)
+  end
+end
+
+desc "Removes a keychain copy by name."
+desc "#### Options"
+desc " * **`name`**: The keychain name. Required."
+private_lane :removeKeychain do |options|
+  name = options[:name]
+
+  raise "removeKeychain: Requires name parameter." unless name
+
+  keychain_name = "#{name}-FastlaneInstalled"
+
+  UI.message("Deleting keychain copy named '#{keychain_name}'...")
+  delete_keychain(name: keychain_name)
+end

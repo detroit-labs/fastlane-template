@@ -1,0 +1,13 @@
+desc "Installs any provisioning profiles from a path relative to the root of the project."
+desc "#### Environment Variables"
+desc " * **`PROVISIONING_PROFILE_PATH`**: A provisioning profile path. Required."
+lane :installProfiles do
+  path = ENV["PROVISIONING_PROFILE_PATH"]
+
+  raise "installProfiles: A provisioning profile path environment variable is required. (PROVISIONING_PROFILE_PATH)" unless path
+
+  Dir.glob("../#{path}/*.mobileprovision") do |profile|
+    UI.message("Found profile: #{File.basename(profile)}")
+    FastlaneCore::ProvisioningProfile.install(profile)
+  end
+end
