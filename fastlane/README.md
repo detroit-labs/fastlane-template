@@ -132,7 +132,7 @@ Builds and packages iOS app.
 
  * **`GYM_SCHEME`**: The project's scheme. Required.
 
- * **`GYM_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-skipMacroValidation'.
+ * **`GYM_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-onlyUsePackageVersionsFromResolvedFile -skipMacroValidation'.
 
  * **`PROVISIONING_PROFILE`**: The provisioning profile. Required.
 
@@ -150,7 +150,7 @@ Runs all the tests.
 
  * **`SCAN_SCHEME`**: The project's scheme. Required.
 
- * **`SCAN_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-skipMacroValidation'.
+ * **`SCAN_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-onlyUsePackageVersionsFromResolvedFile -skipMacroValidation'.
 
 ### ios uploadToFirebase
 

@@ -10,7 +10,7 @@ platform :ios do
   desc " * **`GYM_CONFIGURATION`**: The gym configuration. Required."
   desc " * **`GYM_EXPORT_METHOD`**: The gym export method. Required."
   desc " * **`GYM_SCHEME`**: The project's scheme. Required."
-  desc " * **`GYM_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-skipMacroValidation'."
+  desc " * **`GYM_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-onlyUsePackageVersionsFromResolvedFile -skipMacroValidation'."
   desc " * **`PROVISIONING_PROFILE`**: The provisioning profile. Required."
   lane :build do
     bundle_identifier = ENV["BUNDLE_IDENTIFIER"]
@@ -27,7 +27,7 @@ platform :ios do
         bundle_identifier => provisioning_profile
       }
     }
-    xcargs = ENV["GYM_XCARGS"] || "-skipMacroValidation"
+    xcargs = ENV["GYM_XCARGS"] || "-onlyUsePackageVersionsFromResolvedFile -skipMacroValidation"
 
     raise "build: A gym configuration environment variable is required. (GYM_CONFIGURATION)" unless configuration
     raise "build: The project's scheme environment variable is required. (GYM_SCHEME)" unless scheme
