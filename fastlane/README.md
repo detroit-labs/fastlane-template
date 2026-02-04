@@ -33,6 +33,8 @@ Updates project dependencies in Bundler, then sends a pull request if there are 
 
  * **`GITHUB_REPO`**: GitHub repository name. Should be passed as a secure text value. Required.
 
+ * **`GITHUB_MAIN_BRANCH`**: GitHub repository main branch name. Optional. Defaults to 'main'.
+
  * **`PROJECT_GITHUB_API_TOKEN`**: GitHub API token. Should be passed as a secure text value. Required.
 
 ### updateDependencies
@@ -132,7 +134,7 @@ Builds and packages iOS app.
 
  * **`GYM_SCHEME`**: The project's scheme. Required.
 
- * **`GYM_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-skipMacroValidation'.
+ * **`GYM_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-onlyUsePackageVersionsFromResolvedFile -skipMacroValidation'.
 
  * **`PROVISIONING_PROFILE`**: The provisioning profile. Required.
 
@@ -150,7 +152,7 @@ Runs all the tests.
 
  * **`SCAN_SCHEME`**: The project's scheme. Required.
 
- * **`SCAN_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-skipMacroValidation'.
+ * **`SCAN_XCARGS`**: Pass additional arguments to xcodebuild. Optional. Defaults to '-onlyUsePackageVersionsFromResolvedFile -skipMacroValidation'.
 
 ### ios uploadToFirebase
 
