@@ -1,16 +1,18 @@
 desc "Updates project dependencies in Bundler, then sends a pull request if there are changes."
 desc "#### Environment Variables"
 desc " * **`GITHUB_REPO`**: GitHub repository name. Should be passed as a secure text value. Required."
+desc " * **`GITHUB_MAIN_BRANCH`**: GitHub repository main branch name. Optional. Defaults to 'main'."
 desc " * **`PROJECT_GITHUB_API_TOKEN`**: GitHub API token. Should be passed as a secure text value. Required."
 lane :updateDependenciesUsingPullRequest do |options|
   repository_name = ENV["GITHUB_REPO"]
+  main_branch = ENV["GITHUB_MAIN_BRANCH"] || "main"
   api_token = ENV["PROJECT_GITHUB_API_TOKEN"]
 
   raise "updateDependencies: A GitHub repository name environment variable is required. (GITHUB_REPO)" unless repository_name
+  raise "updateDependencies: A GitHub repository main branch name is required. (GITHUB_MAIN_BRANCH)" unless main_branch
   raise "updateDependencies: A GitHub API token environment variable is required. (PROJECT_GITHUB_API_TOKEN)" unless api_token
 
   branch_name = "update-dependencies"
-  main_branch = "main"
 
   updateDependencies
 
