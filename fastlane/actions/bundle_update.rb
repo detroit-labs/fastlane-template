@@ -6,7 +6,7 @@ module Fastlane
       end
 
       def self.run(params)
-        cmd = ['bundle update']
+        cmd = ['bundle update --all']
 
         sh(cmd.join(' '))
       end

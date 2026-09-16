@@ -1,10 +1,14 @@
-desc "Run Blackboard using Mint from the root of the project."
+desc "Run Blackboard using Mise/Mint from the root of the project."
 lane :blackboard do
   Dir.chdir("..") do
     if File.exist?(".blackboard.yml")
+      if File.exist?("mise.toml")
+        sh "mise exec -- blackboard"
+      elsif File.exist?("Mintfile")
         sh "mint run blackboard"
-      else
-        UI.error("Blackboard configuration file not found, please create one. (.blackboard.yml)")
       end
+    else
+      UI.error("Blackboard configuration file not found, please create one. (.blackboard.yml)")
+    end
   end
 end
