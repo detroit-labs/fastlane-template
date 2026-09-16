@@ -1,8 +1,12 @@
-desc "Run SwiftLint using Mint from the root of the project."
+desc "Run SwiftLint using Mise/Mint from the root of the project."
 lane :lint do
   Dir.chdir("..") do
     if File.exist?(".swiftlint.yml")
-      sh "mint run swiftlint lint"
+      if File.exist?("mise.toml")
+        sh "mise exec -- swiftlint lint"
+      elsif File.exist?("Mintfile")
+        sh "mint run swiftlint lint"
+      end
     else
       UI.error("SwiftLint configuration file not found, please create one. (.swiftlint.yml)")
     end

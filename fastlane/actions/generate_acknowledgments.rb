@@ -18,7 +18,11 @@ module Fastlane
 
         sh("find \"#{target}/Settings.bundle/Packages/\" -type f -name '*.plist' -print0 | xargs -0 rm -rf {}")
 
-        sh("mint run swift-package-list \"#{source}\" --requires-license --output-type settings-bundle --output-path \"#{target}\"")
+        if File.exist?("mise.toml")
+          sh("mise exec -- swift-package-list \"#{source}\" --requires-license --output-type settings-bundle --output-path \"#{target}\"")
+        elsif File.exist?("Mintfile")
+          sh("mint run swift-package-list \"#{source}\" --requires-license --output-type settings-bundle --output-path \"#{target}\"")
+        end
 
         File.delete("#{target}/Settings.bundle/Root.plist")
         sh("find \"#{target}/Settings.bundle/\" -type d -name '*.lproj' -print0 | xargs -0 rm -rf {}")

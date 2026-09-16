@@ -1,4 +1,4 @@
-desc "Run SwiftFormat using Mint from the root of the project."
+desc "Run SwiftFormat using Mise/Mint from the root of the project."
 desc "#### Options"
 desc " * **`strategy`**: A format strategy. Optional. Defaults to 'all'."
 desc "   - **all**: All Swift source files will be formatted."
@@ -13,10 +13,18 @@ lane :format do |options|
       case strategy
         when "all"
           UI.message("Formatting all Swift source files.")
-          sh "mint run swiftformat ./"
+          if File.exist?("mise.toml")
+            sh "mise exec -- swiftformat ./"
+          elsif File.exist?("Mintfile")
+            sh "mint run swiftformat ./"
+          end
         when "staged"
           UI.message("Formatting only Git staged Swift source files.")
-          sh "git diff --diff-filter=d --staged --name-only | grep -e '\\(.*\\)\\.swift$' | tr \\\\n \\\\0 | xargs -0 mint run swiftformat"
+          if File.exist?("mise.toml")
+            sh "git diff --diff-filter=d --staged --name-only | grep -e '\\(.*\\)\\.swift$' | tr \\\\n \\\\0 | xargs -0 mise exec -- swiftformat"
+          elsif File.exist?("Mintfile")
+            sh "git diff --diff-filter=d --staged --name-only | grep -e '\\(.*\\)\\.swift$' | tr \\\\n \\\\0 | xargs -0 mint run swiftformat"
+          end
         else
           raise "format: Unrecognized format strategy: '#{strategy}'"
       end
